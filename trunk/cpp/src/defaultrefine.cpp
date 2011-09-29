@@ -130,7 +130,7 @@ int main (int argc, char *argv[]) {
 					if (usegroups) {
 						groupsfile = flagparams[0];
 					}
-					fpredict(params[0],params[1],params[2],info,nulls,gnulls,gnullsfile,usegroups,groupsfile,format);
+					fpredict(params[0],params[1],params[2],nulls,gnulls,gnullsfile,usegroups,groupsfile,format);
         			return 0;
 				}
 			}
