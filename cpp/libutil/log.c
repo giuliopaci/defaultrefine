@@ -1,6 +1,6 @@
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
-#endif // HAVE_CONFIG_H
+#endif /* HAVE_CONFIG_H */
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -97,7 +97,7 @@ int log_print(int level, const char *filename, int line, char const *fmt, ...)
 	va_end(ap);
 	printf("%s %s %s\n", time, context, msg);
     fh = fopen(LOG_PATH, "a+");
-    if (fh <= 0) {
+    if (fh == NULL) {
         return EIO;
     }
     fprintf(fh, "%s %s %s\n", time, context, msg);
