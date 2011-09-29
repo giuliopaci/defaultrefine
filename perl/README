@@ -1,0 +1,117 @@
+-----------------------------------------------------------------------------------------------------
+defref.pl:  Implementation of Default&Refine
+
+Marelie Davel 
+mdavel@csir.co.za
+August 2005
+Version 
+
+-----------------------------------------------------------------------------------------------------
+
+Usage: predict <data> <rules> <gnulls>
+       predict_info <data> <rules> <gnulls>
+       predict_file <datafile> <rules> <gnulls> <newdict>
+       align <datafile> <aligned_datafile> <gnulls>
+       patts <featurelist> <aligned_datafile> <patts_prefix>
+       rules_single <f> <pattsfile> <newrules>
+       rules_all <featurelist> <patts_prefix> <newrules_prefix>
+
+FILE FORMATS:
+-------------
+  
+  graphemes	= set of 1-character graphemes used
+  phonemes 	= set of 1-character phonemes used
+  word 		= string of graphemes (whole word)
+  leftcontext 	= string of graphemes (to left of a focal grapheme)
+  rightcontext 	= string of graphemes (to right of a focal grapheme)
+  wordpattern 	=  leftcontext-grapheme-rightcontext  
+                  (includes a space to left and right of word context, signifying word boundary)
+  pronunciation = string of phonemes
+  aligned_word 	= graphemes separated by spaces, 0 inserted where necessary 
+  		  (until same number of characters as associated aligned_pron)
+  aligned_pron 	= phonemes separated by spaces, 0 inserted where necessary  
+  		  (until same number of characters as associated aligned_word)
+
+* Word list
+    per line:	word
+    example:	afr.example.words
+
+* Dictionary:
+    per line: 	word;sound;1 
+    example: 	afr.example.dict 
+
+* Aligned dictionary:
+    per line: 	word;aligned_word;aligned_pron
+    example: 	afr.example.dict.aligned 
+
+* Patterns file:
+    per line: 	id;phoneme;wordpattern
+    		(The id is system generated when a patterns file extracted)
+    example: 	afr.example.patts.a
+
+* Rules file:
+    per line:	grapheme;leftcontext;rightcontext;phoneme;integer
+    		(The integer at the end is system generated and indicates the rule number)
+    example:	afr.example.rules
+
+* Graphemic nulls file:
+    per line:	graphemegrapheme;grapheme0grapheme
+    example:	afr.example.gnulls
+
+* Graphemes file:
+    per line:	grapheme
+    example:	afr.example.graphemes
+
+* Phoneme file:
+    per line:	phoneme
+    example:	afr.example.phonemes
+
+
+HOW TO:
+-------
+
+1. Align a dictionary
+
+   Input: 	<datafile> 		Dictionary to be aligned
+   		<feature_file>		Graphemes file
+   		<class_file>		Phonemes file
+   Output:	<aligned_datafile> 	New aligned dictionary
+   		<gnulls> 		Graphemic nulls file
+
+   Run:		./defref.pl align <datafile> <feature_file> <class_file> <aligned_data> <gnulls>
+
+
+2. Extract rules from an aligned dictionary
+
+   Input: 	<feature_file>		Graphemes file
+   		<aligned_datafile> 	Aligned dictionary
+   Interim:	<patts_prefix>.<g>	Patterns file associated with grapheme <g>		
+   Output: 	<newrules_prefix>.<g>	Rules file associated with grapheme <g>
+   		<newrules_prefix>	Rules file (for all graphemes)
+   
+   Run:		./defref.pl patts <featurelist> <aligned_datafile> <patts_prefix>
+   		./defref.pl rules_all <featurelist> <patts_prefix> <newrules_prefix>
+
+
+3. Predict a word
+
+   Input: 	<data>			Word
+   		<rules> 		Rules file	
+   		<gnulls> 		Graphemic nulls file
+   Output: 	standard output		Predicted pronunciation		
+   
+   Run:		./defref.pl predict <data> <rules> <gnulls>
+   		(Use ./defref.pl predict_info <data> <rules> <gnulls> to print the actual rules used.) 
+       
+
+4. Create a dictionary from a word list and rule set
+
+   Input: 	<datafile> 		Word list
+   		<rules> 		Rules file	
+   		<gnulls> 		Graphemic nulls file
+   Output:	<newdict> 		New predicted dictionary
+       
+   Run:		./defref.pl predict_file <datafile> <rules> <gnulls> <newdict>
+
+-----------------------------------------------------------------------------------------------------
+

@@ -1,0 +1,12 @@
+2011-09-29  J.W.F. Thirion  <thirionjwf@gmail.com>
+
+	* Release 0.1.0.
+	* Packaged into a GNU autotools project.
+
+2011-09-27  Richard Carlson  <rcarlson@csir.co.za>
+
+	* Created the library.
+
+2007-12-19  Marelie H. Davel  <mdavel@csir.co.za>
+
+	* Initial release of the code.
