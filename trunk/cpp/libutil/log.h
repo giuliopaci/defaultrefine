@@ -23,4 +23,4 @@ int log_print(int level, const char *filename, int line, char const *fmt, ...);
 }
 #endif
 
-#endif // LOG_H_
+#endif /* LOG_H_ */
