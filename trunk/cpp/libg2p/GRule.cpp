@@ -61,7 +61,7 @@ vector<string> GRule::get_rules(void)
 	return rule_strings;
 }
 
-bool GRule::has_default(char *g,GNode* root) const {
+bool GRule::has_default(GNode* root) const {
 		return (rules.front().patp->compare(*(root->get_name()))==0);
 }
 

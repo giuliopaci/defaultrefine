@@ -28,7 +28,7 @@ public:
 
 	bool get_use_groups() const {return use_groups;};
 	void add(const string*,const string*,int);
-	bool has_default(char*,GNode*) const;
+	bool has_default(GNode*) const;
 
 	void add_default(char*,GNode*);
 	void add_empty(char*,GNode*);

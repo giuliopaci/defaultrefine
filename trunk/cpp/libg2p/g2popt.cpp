@@ -148,7 +148,7 @@ void rules_frompats_opt(char * g,map<int, map<string, map <string,int> > > &gpat
 		grules->add_empty(g,tree->get_root());
 	} else {
 		//Add 1-g backoff rule, if missed by other rules
-		if (grules->has_default(g,tree->get_root())==0) {
+		if (grules->has_default(tree->get_root())==0) {
 			grules->add_default(g,tree->get_root());
 		}
 	}
@@ -268,7 +268,7 @@ void format_result(string &word, vector<string> &result,string &format, bool nul
 	}
 }
 
-int fpredict(char * listfile, char * rulesfile, char * outfile, bool info, bool nulls,bool gnulls, char *gnullsfile, bool usegroups, char *groupsfile, string format ) {
+int fpredict(char * listfile, char * rulesfile, char * outfile, bool nulls,bool gnulls, char *gnullsfile, bool usegroups, char *groupsfile, string format ) {
 	RTree *rtree = new RTree;
 	vector<string> glist;
 	if (gnulls) read_gnulls(gnullsfile,glist);
