@@ -1,0 +1,50 @@
+Getting started
+---------------
+
+Ensure that your system contains a compatible compiler and development
+libraries and then compile with ./configure, make and make install.
+
+See ./configure --help for more options.
+
+About
+-----
+
+    API for Marelie Davel's G2P library.
+
+Dependencies
+------------
+
+    $ sudo apt-get install libboost-python-dev
+	OR
+    $ sudo yum install boost boost-devel boost-python
+
+Description
+-----------
+
+    The G2P library consists of a C++ core library with a Python wrapper for
+    convenience.  At it's core, the G2P library takes a dictionary of word
+    pronunciations and performs prediction of pronunciations of new words.  The
+    algorithm functions as follows:
+
+    1) Bootstrap the process with a dictionary consisting of a list of words,
+       including the graphemic representation (eg. 'h', 'e', 'l', 'l', 'o') and the
+       corresponding phonetic pronunciations (eg.  'h\', '@', 'l', '@u').
+    2) For each word/pronunciation pair align graphemes to phonemes using Viterbi
+       alignment.  When a single phoneme is produced from more than one grapheme
+       (eg. The last consonant sound in "rose" comes from two letters 'z', and 'e')
+       register a graphemic null.  When a single phoneme is required to realise
+       more than one grapheme (eg. The last consonant sound in "max" comes from two
+       phonemes 'k', and 's') register a phonemic null.
+    3) Generate rules for phoneme prediction.  For each grapheme-to-phoneme
+       alignment pair, find the smallest graphemic context that provides a unique
+       mapping to a specific phoneme.
+
+        Rules can be expressed as follows:
+
+            (left context : grapheme : right context) --> phoneme.
+
+        For example:
+
+            ("h\" : '@' : 'l', '@u') --> 'e'
+
+    4) Predict pronunciation for a new word based on rules.

@@ -1,0 +1,15 @@
+Important notes
+---------------
+
+User visible incompatible changes
+---------------------------------
+
+Date        Modules         Changes
+
+2011-09-29  all             First release 0.1.0.
+
+# This is for Emacs.
+# Local Variables:
+# indent-tabs-mode: nil
+# whitespace-check-buffer-indent: nil
+# End:
