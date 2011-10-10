@@ -18,7 +18,7 @@ BEGIN {
 	
 	sub read_id($){
 		my $id = shift @_;
-		if (open FH, "$id") { 
+		if (open FH, "<:encoding(utf8)", "$id") { 
 			$name = <FH>; chomp $name;
 			close FH;
 			return $name;
@@ -85,7 +85,7 @@ sub reset_homedir($) {
 sub write_langid($) {
 	my $lname = shift @_;
 	print "-- Enter write_lid: $lname\n" if $debug;
-	if (open FH,">$langid") {
+	if (open FH,">:encoding(utf8)","$langid") {
 		print FH "$lname";
 		close FH;
 		return 0;
@@ -96,7 +96,7 @@ sub write_langid($) {
 sub write_expid($) {
 	my $ename = shift @_;
 	print "-- Enter write_expid: $ename\n" if $debug;
-	if (open FH,">$expid") {
+	if (open FH,">:encoding(utf8)","$expid") {
 		print FH "$ename";
 		close FH;
 		return 0;
@@ -109,7 +109,7 @@ sub write_expid($) {
 sub read_graphs(\@) {
         my $gp = shift @_;
         print "-- Enter read_graphs $grpt\n" if $debug;
-        open GH, "$grpt" or die "Unable to open $grpt\n";
+        open GH, "<:encoding(utf8)","$grpt" or die "Unable to open $grpt\n";
         while (<GH>) { chomp; push @$gp,$_ }
         print "graphs: @$gp" if $debug;
         close GH;
@@ -119,7 +119,7 @@ sub read_graphs(\@) {
 sub fread_graphs($\@) {
         my ($gf,$gp) = @_;
         print "-- Enter read_graphs $grpt\n" if $debug;
-        open IH, "$gf" or die "Unable to open $gf\n";
+        open IH, "<:encoding(utf8)", "$gf" or die "Unable to open $gf\n";
         while (<IH>) { chomp; push @$gp,$_ }
         print "graphs: @$gp" if $debug;
         close IH;
@@ -128,7 +128,7 @@ sub fread_graphs($\@) {
 sub read_phones(\@) {
         my $pp = shift @_;
         print "-- Enter read_phones $phnt\n" if $debug;
-        open PH, "$phnt" or die;
+        open PH, "<:encoding(utf8)", "$phnt" or die;
         while (<PH>) { chomp; push @$pp,$_ }
         print "phones: @$pp" if $debug;
         close PH;
@@ -140,7 +140,7 @@ sub verify_file($\@) {
 	my ($ftype,$errlistp) = @_;
 	print "-- Enter verify_file $cdir/$ftype\n" if $debug;
 	local (@graphs, @phones);
-	open IH, "$cdir/$ftype" or die "Cannot open $cdir/$ftype";
+	open IH, "<:encoding(utf8)", "$cdir/$ftype" or die "Cannot open $cdir/$ftype";
 	my $err = 0; my ($gstr,$pstr,$tstr); 
 	read_graphs(@graphs); $gstr=join ",",@graphs; 
 	read_phones(@phones); push @phones,"0"; $pstr=join ",",@phones; 

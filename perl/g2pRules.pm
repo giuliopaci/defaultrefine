@@ -73,7 +73,7 @@ sub g2p_wordlist($\%\%\%) {
 	my ($wname,$gnullp,$dp,$sp) = @_;
 	%$dp = ();
 	%$sp = ();
-	open IH, "$wname" or die "Cannot open $wname";
+	open IH, "<:encoding(utf8)", "$wname" or die "Cannot open $wname";
 	while (<IH>) {
 		chomp;
 		my $sound = "";
@@ -93,7 +93,7 @@ sub g2p_wordlist($\%\%\%) {
 sub fg2p_wordlist_align($$$$) {
 	#Generate a pronunciation for a wordlist, leaving graphemic and phonemic nulls in place
 	my ($wf,$rf,$gf,$of) = @_;
-	open OH, ">$of" or die "Error opening $of\n";
+	open OH, ">:encoding(utf8)","$of" or die "Error opening $of\n";
 	if ($rtype eq "olist") {
 		fread_rules_olist($rf);
 	} else {
@@ -122,7 +122,7 @@ sub analyse_wordlist($$) {
 	#Print result + rules applied (used during debugging)
 	
 	my ($wname,$gname) = @_;
-	open WH, "$wname" or die "Cannot open $wname";
+	open WH, "<:encoding(utf8)", "$wname" or die "Cannot open $wname";
 	my %gnulls=();
 	fread_gnull_list($gname,%gnulls);
 	my $keepmsg=$msg;

@@ -15,9 +15,9 @@ BEGIN {
 
 sub split_data($$$$$) {
 	my ($iname,$n,$num,$sname,$lname) = @_;
-	open IH, "$iname" or die "Cannot open $iname";
-	open LH, ">$lname" or die "Cannot open $lname";
-	open SH, ">$sname" or die "Cannot open $sname";
+	open IH, "<:encoding(utf8)", "$iname" or die "Cannot open $iname";
+	open LH, ">:encoding(utf8)", "$lname" or die "Cannot open $lname";
+	open SH, ">:encoding(utf8)", "$sname" or die "Cannot open $sname";
 
 	#my $cmd = "wc $iname | gawk '{print \$1}'";
 	#my $tot = `$cmd`;
@@ -39,7 +39,7 @@ sub split_data($$$$$) {
 sub split_parts($$$) {
 	my ($iname,$n,$oname) = @_;
 	my @all=();
-	open IH, "$iname" or die "Error opening $iname\n";
+	open IH, "<:encoding(utf8)", "$iname" or die "Error opening $iname\n";
 	while (<IH>) {
 		chomp;
 		push @all,$_;
@@ -52,7 +52,7 @@ sub split_parts($$$) {
 	@all = sort {$order{$a}<=>$order{$b}} @all;
 	
 	foreach my $fn (1..$n) {
-		open $fn, ">$oname.$fn" or die "Error opening $oname.$fn\n";
+		open $fn, ">:encoding(utf8)", "$oname.$fn" or die "Error opening $oname.$fn\n";
 	}
 
 	my $fnum=1;
@@ -75,7 +75,7 @@ sub combine_parts($$$) {
 	my @train=();
 	my @test=();
 	for my $i (1..$n) {
-		open $i, "$iname.$i" or die "Error opening $iname.$i\n";
+		open $i, "<:encoding(utf8)", "$iname.$i" or die "Error opening $iname.$i\n";
 		while (<$i>) {
 			chomp;
 			for my $o (1..$n) {
@@ -90,14 +90,14 @@ sub combine_parts($$$) {
 	}
 	
 	for my $o (1..$n) {
-		open $o, ">$oname.train.$o" or die "Error opening $oname.train.$o\n";
+		open $o, ">:encoding(utf8)", "$oname.train.$o" or die "Error opening $oname.train.$o\n";
 		@towrite = sort @{$train[$o]};
 		foreach my $t (@towrite) {
 			print $o "$t\n";
 		}
 		close $o;
 		
-		open $o, ">$oname.test.$o" or die "Error opening $oname.test.$o\n";
+		open $o, ">:encoding(utf8)", "$oname.test.$o" or die "Error opening $oname.test.$o\n";
 		@towrite = sort @{$test[$o]};
 		foreach my $t (@towrite) {
 			print $o "$t\n";
@@ -110,7 +110,7 @@ sub combine_results($$$) {
 	my ($iname,$parts,$oname)=@_;
 	
 	use Statistics::Descriptive;
-	open OH, ">$oname" or die "Error opening $oname\n";
+	open OH, ">:encoding(utf8)", "$oname" or die "Error opening $oname\n";
 	my @plist = split /;/,$parts;
 	
 	%acc1=();
@@ -118,7 +118,7 @@ sub combine_results($$$) {
 	%acc3=();
 	printf OH "$oname [$parts]\n";
 	foreach my $p (@plist) {
-		open IH, "$iname.$p" or die "Error opening $iname.$p\n";
+		open IH, "<:encoding(utf8)", "$iname.$p" or die "Error opening $iname.$p\n";
 		#<IH>;
 		my $name="";
 		while (<IH>) {
@@ -166,8 +166,8 @@ sub combine_results($$$) {
 
 sub compare_results_3col ($$$) {
 	my ($fname1,$fname2,$ignore)=@_;
-	open IH1, "$fname1" or die "Error opening $fname1\n";
-	open IH2, "$fname2" or die "Error opening $fname2\n";
+	open IH1, "<:encoding(utf8)", "$fname1" or die "Error opening $fname1\n";
+	open IH2, "<:encoding(utf8)", "$fname2" or die "Error opening $fname2\n";
 	my %result1=();
 	my %result2=();
 	my $linecnt=0;

@@ -48,7 +48,7 @@ sub fwrite_groups(\%$$) {
 	#	list of graphemes in group:list of graphemes excluded; template:outcome; template:outcome; ...
 	
 	my ($groupp,$mingroupsize,$oname) = @_;
-	open OH, ">$oname" or die "Error opening $oname\n";
+	open OH, ">:encoding(utf8)", "$oname" or die "Error opening $oname\n";
 
 	foreach my $group (sort {length $a <=> length $b} keys %{$groupp}) {
 		my ($in,$out) = split /:/,$group;
@@ -72,7 +72,7 @@ sub fread_groups($\%) {
 	#	into newp->{list of graphems in group:list of graphemes excluded}{template:outcome}
 
 	my ($iname,$groupp)=@_;
-	open IH, "$iname" or die "Error opening $iname";
+	open IH, "<:encoding(utf8)", "$iname" or die "Error opening $iname";
 	%glist=();
 	while (<IH>) {
 		chomp;
@@ -328,9 +328,9 @@ sub rules_frompats_withgroups_olist_large($\@$\%\%$) {
 	
 	if ($ngram==1) {
 		#temporary file created to write probabilities - integrate better once tested
-		open TH, ">$rulefile.prob" or die "Error opening $rulefile.prob";
+		open TH, ">:encoding(utf8)", "$rulefile.prob" or die "Error opening $rulefile.prob";
 		if ($find_single==1) {
-			open EH, ">$rulefile.single" or die;
+			open EH, ">:encoding(utf8)", "$rulefile.single" or die;
 		}
 	}
 	

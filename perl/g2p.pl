@@ -383,7 +383,7 @@ sub cl_analyse_dict2 ($$$) {
 	my ($ad1name,$ad2name,$resname) = @_;
 	print "Analyse results for comparison: $ad1name and $ad2name\n";
 	print "Results in: $resname\n";
-	open OH, ">$resname" or die "Error opening $resname\n";
+	open OH, ">:encoding(utf8)", "$resname" or die "Error opening $resname\n";
 	fread_align($ad1name,%agd1,%apd1);
 	fread_align($ad2name,%agd2,%apd2);
 	my %diff=();
@@ -648,7 +648,7 @@ sub cl_id_gnulls($){
 
 sub cl_analyse_g2p($$) {
 	my ($aname,$oname)=@_;
-	open OH,">$oname" or die "Error opening $oname";
+	open OH,">:encoding(utf8)","$oname" or die "Error opening $oname";
 	my %agd=();
 	my %apd=();
 	my %cnt=();
@@ -757,7 +757,7 @@ sub cl_dict_getdisagree ($$$) {
 
 sub fread_analyse ($\%\%) {
 	my ($fname,$dictp,$rulep) = @_;
-	open IH,$fname or die "Error opening $fname";
+	open IH,"<:encoding(utf8)",$fname or die "Error opening $fname";
 	my $word="";
 	while (<IH>) {
 		chomp;
@@ -774,9 +774,9 @@ sub fread_analyse ($\%\%) {
 sub cl_cmpdicts($$$$$) {
 	my ($words,$d1,$d2,$dref,$result)=@_;
 	#Assumes an analyse_file exists for each dict, and a diff word list;
-	open IH1, ">$result.OK1" or die "Error opening $result.OK1";
-	open IH2, ">$result.OK2" or die "Error opening $result.OK2";
-	open IH3, ">$result.none" or die "Error opening $result.none";
+	open IH1, ">:encoding(utf8)","$result.OK1" or die "Error opening $result.OK1";
+	open IH2, ">:encoding(utf8)","$result.OK2" or die "Error opening $result.OK2";
+	open IH3, ">:encoding(utf8)","$result.none" or die "Error opening $result.none";
 	my %dictref=(); my %statref=();
 	my %dict1=(); my %arule1=();
 	my %dict2=(); my %arule2=();

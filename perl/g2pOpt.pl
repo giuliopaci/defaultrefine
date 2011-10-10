@@ -73,7 +73,7 @@ sub rules_frompats_opt($\%\%\%\%) {
 
 sub fread_tree_patts(\%$) {
     my ($patp,$fname)=@_;
-    open IH, "$fname" or die "Error opening $fname\n";	
+    open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";	
     while (<IH>) {
 	chomp;
 	my ($p,$w) = split ";";

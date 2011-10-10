@@ -20,7 +20,7 @@ BEGIN {
 sub read_archive() {
 	print "-- Enter read_archive: $adir\n" if $debug;
 	$#archive = -1; 
-	open FH,"$adir/$at" or die "Unable to open archive $adir/$at";
+	open FH,"<:encoding(utf8)", "$adir/$at" or die "Unable to open archive $adir/$at";
 	while (<FH>) {
 		chomp; print "\t$_\n" if $debug;
 		push @archive,$_;
@@ -75,7 +75,7 @@ sub store_file($) {
 sub init_tlog() {
 	my $fname = "$cdir/$tlog";
 	print "-- Enter init_tlog: $fname\n" if $debug;
-	open FH,">$fname" or die;
+	open FH,">:encoding(utf8)", "$fname" or die;
 	print FH "TLOG_VERSION 1.1\n";
 	close FH;
 	write_tlog("init","$fname");
@@ -86,7 +86,7 @@ sub write_tlog($$) {
 	my ($event,$info) = @_;
 	my $fname = "$cdir/$tlog";
 	print "-- Enter write_tlog: $event,$info,$fname\n" if $debug;
-	open FH,">>$fname" or die;
+	open FH,">>:encoding(utf8)", "$fname" or die;
 	my ($sec, $min, $hour,$mday,$mon,$year) = gmtime();
 	my $cnt = timelocal(gmtime());
 	$year=$year-100; $mon++;
@@ -303,7 +303,7 @@ sub analyse_tlog_v1_1 () {
 
 sub analyse_tlog ($) {
 	my $lname = shift @_;
-	open IH, $lname or die "Cannot open $lname";
+	open IH, "<:encoding(utf8)", $lname or die "Cannot open $lname";
 	my @log=(); my $i=0; my $logver;
 
 	my $line1 = <IH>; chomp($line1);
@@ -322,7 +322,7 @@ sub analyse_tlog ($) {
 
 sub analyse_vlog_dict ($$) {
 	my ($lname,$dname) = @_;
-	open LH, $lname or die "Cannot open $lname";
+	open LH, "<:encoding(utf8)", $lname or die "Cannot open $lname";
 	my %dict=(); my %stat=();
 	fread_dict($dname,%dict,%stat);
 	
@@ -368,7 +368,7 @@ sub analyse_vlog_dict ($$) {
 
 sub analyse_vlog ($) {
 	my ($lname) = @_;
-	open LH, $lname or die "Cannot open $lname";
+	open LH, "<:encoding(utf8)", $lname or die "Cannot open $lname";
 	
 	<LH>;
 	while (<LH>) {

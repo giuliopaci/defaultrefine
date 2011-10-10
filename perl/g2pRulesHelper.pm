@@ -181,7 +181,7 @@ sub fread_gpatts_limit($$\%\%$) {
 	#Read all patterns from <$fname> (related to a single grapheme)
 	#Update <$gp>
 	my ($from,$to,$gp,$wp,$fname) = @_;
-	open IH, "$fname" or die "Error opening $fname\n";	
+	open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";	
 	while (<IH>) {
 		chomp;
 		my ($p,$w) = split ";";
@@ -198,7 +198,7 @@ sub fread_gpatts_limit_wspecific($$$\%\%$) {
 	#Read all patterns from <$fname> (related to a single grapheme)
 	#Update <$gp>
 	my ($word,$from,$to,$gp,$wp,$fname) = @_;
-	open IH, "$fname" or die "Error opening $fname\n";	
+	open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";	
 	while (<IH>) {
 		chomp;
 		my ($p,$w) = split ";";
@@ -269,7 +269,7 @@ sub add_gpatts_limit_wspecific($$$\%\%\%\%) {
 sub fread_array(\@$) {
 	my ($ap,$fn)=@_;
 	print "-- Enter fread_array $fn\n" if $debug;
-        open FH, "$fn" or die "Unable to open $fn\n";
+        open FH, "<:encoding(utf8)","$fn" or die "Unable to open $fn\n";
         while (<FH>) { chomp; push @$ap,$_ }
         print "graphs: @$ap" if $debug;
         close FH;

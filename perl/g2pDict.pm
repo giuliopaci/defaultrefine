@@ -45,7 +45,7 @@ BEGIN {
 sub fread_words($\@) {
 	my ($fname,$wp) = @_;
 	print "-- Enter fread_words: $fname\n" if $debug;
-	open IH,$fname or die "Cannot open $fname";
+	open IH,"<:encoding(utf8)",$fname or die "Cannot open $fname";
 	@$wp = ();
 	while (<IH>) {
 		chomp; 
@@ -58,7 +58,7 @@ sub fread_words($\@) {
 sub fwrite_words($\@) {
 	my ($fname,$wp) = @_;
 	print "-- Enter write_words $fname\n" if $debug;
-	open OH,">$fname" or die "Cannot open $fname";
+	open OH,">:encoding(utf8)","$fname" or die "Cannot open $fname";
 	if ($#$wp<0) {print OH "\n"}
 	else { foreach my $w (@$wp){print OH "$w\n";}}
 	close OH;
@@ -71,7 +71,7 @@ sub fread_dict($\%\%) {
 	print "-- Enter fread_dict: $dname\n" if $debug;
 	%$dictp = ();
 	%$statp = ();
-	open  IH, $dname or die "Cannot open file $dname";
+	open  IH, "<:encoding(utf8)", $dname or die "Cannot open file $dname";
 	while (<IH>){
 		chomp; my @line = split /;/;
 		my $word=$line[0];
@@ -128,7 +128,7 @@ sub fread_dict($\%\%) {
 
 sub fwrite_dict($\%\%) {
         my ($dname,$dp,$sp) = @_;
-        open OH, ">$dname" or die "Cannot open $dname";
+        open OH, ">:encoding(utf8)","$dname" or die "Cannot open $dname";
 	foreach my $word (sort keys %{$dp}) {
 		if ($dictType==$doubleType{'pos_one'}) {
 			my @poslist = keys %{$dp->{$word}};
@@ -231,8 +231,8 @@ sub rm_notcorrect_dict(\%\%) {
 sub fwlist_fromdict($$$$) {
 	my ($max,$test,$dname,$wname) = @_;
 	print "-- Enter fwlist_fromdict: $max, $test,$dname,$wname\n" if $debug;
-	open IH, "$dname" or die "Cannot open $dname";
-	open OH, ">$wname" or die "Cannot open $wname";
+	open IH, "<:encoding(utf8)", "$dname" or die "Cannot open $dname";
+	open OH, ">:encoding(utf8)","$wname" or die "Cannot open $wname";
 	my $n=0;
 	while (<IH>) {
 		chomp; my @i = split /;/;
@@ -247,7 +247,7 @@ sub fwlist_fromdict($$$$) {
 
 sub fwlist_first($\%$$\@) {
 	my ($mname,$sp,$test,$max,$wp) = @_;
-	open IH, "$mname" or die "Cannot open $mname";
+	open IH, "<:encoding(utf8)", "$mname" or die "Cannot open $mname";
 	my $n=0;
 	while (<IH>) {
 		chomp; 
@@ -381,7 +381,7 @@ sub cmp_dicts($$\%) {
 sub write_htkmlf(\%$$) {
 	my ($dictp,$fname,$ext) = @_;
 	print "-- Enter write_htkmlf $fname\n" if $debug;
-	open OH, ">$fname" or die "Cannot open $fname";
+	open OH, ">:encoding(utf8)", "$fname" or die "Cannot open $fname";
 	foreach $i ('0'..'9') { $num{$i} = 'a'.$i }  #HTK breaks on phoneme names that are numbers only
 	print OH "#!MLF!#\n";
 	my @wlist = sort keys %$dictp;
@@ -401,7 +401,7 @@ sub write_htkmlf(\%$$) {
 sub write_htkmlf_1extra(\%$$) {
 	my ($dictp,$fname,$ext) = @_;
 	print "-- Enter write_htkmlf $fname\n" if $debug;
-	open OH, ">$fname" or die "Cannot open $fname";
+	open OH, ">:encoding(utf8)", "$fname" or die "Cannot open $fname";
 	foreach $i ('0'..'9') { $num{$i} = 'a'.$i }
 	print OH "#!MLF!#\n";
 	foreach my $word (keys %{$dictp}) {
@@ -447,7 +447,7 @@ sub fcmp_phoneAcc($$$$) {
 sub read_changed(\%\%) {
 	my ($cdp,$csp) = @_; 
 	print "-- Enter read_changed " if $debug;
-	open IH, "$cdir/$ct" or die "Cannot open file $cdir/$ct";
+	open IH, "<:encoding(utf8)", "$cdir/$ct" or die "Cannot open file $cdir/$ct";
 	while (<IH>) {
 		chomp; my ($word,$sound,$stat) = split /;/;
 		$cdp->{$word} = $sound;
@@ -462,7 +462,7 @@ sub read_changed(\%\%) {
 sub write_changed(\%\%) {
 	my ($cdp,$csp) = @_; 
 	print "-- Enter write_changed $cdir/$ct" if $debug;
-	open OH, ">$cdir/$ct" or die "Cannot open file $cdir/$ct";
+	open OH, ">:encoding(utf8)", "$cdir/$ct" or die "Cannot open file $cdir/$ct";
 	foreach $word (keys %{$cdp}) {
 		print OH "$word;$cdp->{$word};$csp->{$word}\n";
 	}
