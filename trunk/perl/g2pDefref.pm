@@ -213,7 +213,7 @@ sub custom_fread_pattsfile_limit_std($$$\%\%) {
 
 sub custom_fread_pattsfile_limit_1extra($$$\%\%) {
 	my ($from,$to,$fname,$patp,$newp)=@_;
-	open IH, "$fname" or die "Error opening $fname\n";	
+	open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";	
 	while (<IH>) {
 		chomp;
 		my @parts = split /;/;
@@ -335,7 +335,7 @@ sub custom_check_and_add_default_std($$) {
 		$rorder{$g}[0]="-$feat-";
 		print "$feat:\t[0]\t[-$feat-] --> $c\n"; #if $debug;
 		
-		open OH, ">>$rulefile" or die "Error opening file $rulefile\n";
+		open OH, ">>:encoding(utf8)", "$rulefile" or die "Error opening file $rulefile\n";
 		print OH "$feat;;;$c;0;0\n";
 		close OH;
 		
@@ -358,7 +358,7 @@ sub custom_check_and_add_default_1extra($$) {
 		$rorder{$g}[0]="-$feat-";
 		print "$feat:\t[0]\t[-$feat-] --> $c\n"; #if $debug;
 		
-		open OH, ">>$rulefile" or die "Error opening file $rulefile\n";
+		open OH, ">>:encoding(utf8)", "$rulefile" or die "Error opening file $rulefile\n";
 		print OH "$feat;;;;$c;0;0\n";
 		close OH;
 		
@@ -1141,7 +1141,7 @@ sub find_rules_single($$$) {
 sub fwrite_patts_dr(\%$$) {
 	my ($allp,$featf,$fname) = @_;
 	foreach my $g (keys %$allp) {
-		open OH, ">>$fname.$g" or die "Error opening $fname.$g\n";
+		open OH, ">>:encoding(utf8)", "$fname.$g" or die "Error opening $fname.$g\n";
 		my $gp = $allp->{$g}; 
 		foreach my $pat (keys %$gp) {
 			print OH "$pat\n";
@@ -1267,7 +1267,7 @@ sub custom_fread_rules_1extra($) {
 	#Update globals %rule,%rorder,%rulecnt,%numfound,$frulenum
 	my $fname = shift @_;
 	print "-- Enter fread_rules_1extra: $fname\n" if $debug;
-	open RH, "$fname" or die "Error opening $fname\n";
+	open RH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";
 
 	%rule = ();
 	%rorder=();

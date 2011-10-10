@@ -32,11 +32,11 @@ sub do_separate_v1($$$$) {
 	#Working version if only 2 variants (used for OALD, changed for Fonilex - see do_separate below)
         my ($iname,$mname,$rname,$oname) = @_;
 	print "Generating variants: \n- from dictionary: $iname\n- map file: $mname\n- restrict file: $rname\n- output dictionary: $oname\n";
-        open IH, "$iname" or die "Cannot open $iname";
-        open MH, "$mname" or die "Cannot open $mname";
-        open RH, "$rname" or die "Cannot open $rname";
-	open OH, ">$oname" or die "Cannot open $oname";
-	open SH, ">$oname.stat" or die "Cannot open $oname.stat";
+        open IH, "<:encoding(utf8)", "$iname" or die "Cannot open $iname";
+        open MH, "<:encoding(utf8)", "$mname" or die "Cannot open $mname";
+        open RH, "<:encoding(utf8)", "$rname" or die "Cannot open $rname";
+	open OH, ">:encoding(utf8)", "$oname" or die "Cannot open $oname";
+	open SH, ">:encoding(utf8)", "$oname.stat" or die "Cannot open $oname.stat";
 	
 	my %mlist=();
 	while (<MH>) {
@@ -153,11 +153,11 @@ sub do_separate_v1($$$$) {
 sub do_separate($$$$) {
         my ($iname,$mname,$rname,$oname) = @_;
 	print "Generating variants: \n- from dictionary: $iname\n- map file: $mname\n- restrict file: $rname\n- output dictionary: $oname\n";
-        open IH, "$iname" or die "Cannot open $iname";
-        open MH, "$mname" or die "Cannot open $mname";
-        open RH, "$rname" or die "Cannot open $rname";
-	open OH, ">$oname" or die "Cannot open $oname";
-	open SH, ">$oname.stat" or die "Cannot open $oname.stat";
+        open IH, "<:encoding(utf8)", "$iname" or die "Cannot open $iname";
+        open MH, "<:encoding(utf8)", "$mname" or die "Cannot open $mname";
+        open RH, "<:encoding(utf8)", "$rname" or die "Cannot open $rname";
+	open OH, ">:encoding(utf8)", "$oname" or die "Cannot open $oname";
+	open SH, ">:encoding(utf8)", "$oname.stat" or die "Cannot open $oname.stat";
 	
 	my %mlist=();
 	while (<MH>) {
@@ -269,8 +269,8 @@ sub do_separate($$$$) {
 sub do_count($$) {
 	my ($iname,$oname) = @_;
 	print "Counting variants: \n- from dictionary: $iname\n- output: $oname\n";
-	open IH, "$iname" or die "Cannot open $iname";
-	open OH, ">$oname" or die "Cannot open $oname";
+	open IH, "<:encoding(utf8)", "$iname" or die "Cannot open $iname";
+	open OH, ">:encoding(utf8)", "$oname" or die "Cannot open $oname";
 
 	walign_init_probs;
 	my %wlist=();
@@ -412,14 +412,14 @@ sub get_var_name(\@\%\$\%) {
 #	#previous version: combined 2 or more variant phones as one
 #	my ($iname,$phons,$oname) = @_;
 #	print "Formatting variants: \n- from dictionary: $iname\n- output: $oname.*\n";
-#	open IH, "$iname" or die "Cannot open $iname";
-#	open IPH, "$phons" or die "Cannot open $phons";
-#	open CH, ">$oname.cnt" or die "Cannot open $oname.cnt";
-#	open LH, ">$oname.log" or die "Cannot open $oname.log";
-#	open DH, ">$oname.dict" or die "Cannot open $oname.dict";
-#	open AH, ">$oname.aligned" or die "Cannot open $oname.aligned";
-#	open MH, ">$oname.map" or die "Cannot open $oname.map";
-#	open PH, ">$oname.phones" or die "Cannot open $oname.phones";
+#	open IH, "<:encoding(utf8)", "$iname" or die "Cannot open $iname";
+#	open IPH, "<:encoding(utf8)", "$phons" or die "Cannot open $phons";
+#	open CH, ">:encoding(utf8)", "$oname.cnt" or die "Cannot open $oname.cnt";
+#	open LH, ">:encoding(utf8)", "$oname.log" or die "Cannot open $oname.log";
+#	open DH, ">:encoding(utf8)", "$oname.dict" or die "Cannot open $oname.dict";
+#	open AH, ">:encoding(utf8)", "$oname.aligned" or die "Cannot open $oname.aligned";
+#	open MH, ">:encoding(utf8)", "$oname.map" or die "Cannot open $oname.map";
+#	open PH, ">:encoding(utf8)", "$oname.phones" or die "Cannot open $oname.phones";
 #
 #	my %plist=();
 #	while (<IPH>) {
@@ -574,14 +574,14 @@ sub get_var_name(\@\%\$\%) {
 sub do_combine($$$) {
 	my ($iname,$phons,$oname) = @_;
 	print "Formatting variants: \n- from dictionary: $iname\n- output: $oname.*\n";
-	open IH, "$iname" or die "Cannot open $iname";
-	open IPH, "$phons" or die "Cannot open $phons";
-	open CH, ">$oname.cnt" or die "Cannot open $oname.cnt";
-	open LH, ">$oname.log" or die "Cannot open $oname.log";
-	open DH, ">$oname.dict" or die "Cannot open $oname.dict";
-	open AH, ">$oname.aligned" or die "Cannot open $oname.aligned";
-	open MH, ">$oname.map" or die "Cannot open $oname.map";
-	open PH, ">$oname.phones" or die "Cannot open $oname.phones";
+	open IH, "<:encoding(utf8)", "$iname" or die "Cannot open $iname";
+	open IPH, "<:encoding(utf8)", "$phons" or die "Cannot open $phons";
+	open CH, ">:encoding(utf8)", "$oname.cnt" or die "Cannot open $oname.cnt";
+	open LH, ">:encoding(utf8)", "$oname.log" or die "Cannot open $oname.log";
+	open DH, ">:encoding(utf8)", "$oname.dict" or die "Cannot open $oname.dict";
+	open AH, ">:encoding(utf8)", "$oname.aligned" or die "Cannot open $oname.aligned";
+	open MH, ">:encoding(utf8)", "$oname.map" or die "Cannot open $oname.map";
+	open PH, ">:encoding(utf8)", "$oname.phones" or die "Cannot open $oname.phones";
 
 	my %plist=();
 	while (<IPH>) {
@@ -784,10 +784,10 @@ sub do_calc_restrict_v1($$$$) {
 	#Version used when only 2 variants possible (used for OALD, updated for Fonilex - see new version of do_calc_restrict)	
 	my ($mapf,$origf,$rewritef,$restrictf) = @_;
 	print "Calculating restrictions:\nMap file: $mapf\nOriginal dict: $origf\nRewrite dict: $rewritef\nOutput file: $restrictf\n";
-	open MH, "$mapf" or die "Cannot open $mapf";
-	open DH, "$origf" or die "Cannot open $origf";
-	open RH, "$rewritef" or die "Cannot open $rewritef";
-	open OH, ">$restrictf" or die "Cannot open $restrictf";
+	open MH, "<:encoding(utf8)", "$mapf" or die "Cannot open $mapf";
+	open DH, "<:encoding(utf8)", "$origf" or die "Cannot open $origf";
+	open RH, "<:encoding(utf8)", "$rewritef" or die "Cannot open $rewritef";
+	open OH, ">:encoding(utf8)", "$restrictf" or die "Cannot open $restrictf";
 	
 	my %mlist=();
 	while (<MH>) {
@@ -875,10 +875,10 @@ sub do_calc_restrict_v1($$$$) {
 sub do_calc_restrict($$$$) {
 my ($mapf,$origf,$rewritef,$restrictf) = @_;
 	print "Calculating restrictions:\nMap file: $mapf\nOriginal dict: $origf\nRewrite dict: $rewritef\nOutput file: $restrictf\n";
-	open MH, "$mapf" or die "Cannot open $mapf";
-	open DH, "$origf" or die "Cannot open $origf";
-	open RH, "$rewritef" or die "Cannot open $rewritef";
-	open OH, ">$restrictf" or die "Cannot open $restrictf";
+	open MH, "<:encoding(utf8)", "$mapf" or die "Cannot open $mapf";
+	open DH, "<:encoding(utf8)", "$origf" or die "Cannot open $origf";
+	open RH, "<:encoding(utf8)", "$rewritef" or die "Cannot open $rewritef";
+	open OH, ">:encoding(utf8)", "$restrictf" or die "Cannot open $restrictf";
 	
 	my %mlist=();
 	while (<MH>) {
@@ -965,9 +965,9 @@ my ($mapf,$origf,$rewritef,$restrictf) = @_;
 sub do_compare($$$) {
 	my ($tname,$rname,$oname) = @_;
 	print "Comparing variant results:\n test dict: $tname\n reference dict: $rname\n output: $oname\n";
-	open TH, "$tname" or die "Cannot open $tname";
-	open RH, "$rname" or die "Cannot open $rname";
-	open OH, ">$oname" or die "Cannot open $oname";
+	open TH, "<:encoding(utf8)", "$tname" or die "Cannot open $tname";
+	open RH, "<:encoding(utf8)", "$rname" or die "Cannot open $rname";
+	open OH, ">:encoding(utf8)", "$oname" or die "Cannot open $oname";
 	
 	my %testlist=();
 	my %cnttest=();

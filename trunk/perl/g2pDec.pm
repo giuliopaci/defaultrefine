@@ -29,7 +29,7 @@ sub fread_rules($){
 	
 	my $fname = shift @_;
 	print "-- Enter fread_rules: $fname\n" if $debug;
-	open RH, $fname or die "Error opening rules file $fname\n";
+	open RH, "<:encoding(utf8)", $fname or die "Error opening rules file $fname\n";
 	%rule = ();
 	%context = ();
 	%rulecnt=();
@@ -57,7 +57,7 @@ sub fwrite_rules($) {
 		
 	my $fname = shift @_;
 	print "-- Enter fwrite_rules: $fname\n" if $debug;
-	open OH, ">$fname" or die;
+	open OH, ">:encoding(utf8)", "$fname" or die;
 	my @rulecntcheck=keys %rulecnt;
 	if ($#rulecntcheck==-1) {
 		#foreach my $g (sort keys %context){
@@ -204,7 +204,7 @@ sub fwrite_patts_full(\%$) {
 	#Append all patterns in <allp> to pattern files <fname>.<g>
 	my ($allp,$fname) = @_;
 	foreach my $g (keys %$allp) {
-		open OH, ">>$fname.$g" or die "Error opening $fname.$g\n";
+		open OH, ">>:encoding(utf8)", "$fname.$g" or die "Error opening $fname.$g\n";
 		my $gp = $allp->{$g}; 
 		foreach my $p (keys %$gp) {
 			my $pp = $gp->{$p};
@@ -229,7 +229,7 @@ sub fread_gpatts_full(\%\%$) {
 	#Read all patterns from <$fname> (related to a single grapheme)
 	#Update <$gp>
 	my ($gp,$wp,$fname) = @_;
-	open IH, "$fname" or die "Error opening $fname\n";	
+	open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";	
 	while (<IH>) {
 		chomp;
 		my ($p,$pat,@words) = split ";";
@@ -245,7 +245,7 @@ sub fread_gpatts_full(\%\%$) {
 sub fwrite_patts(\%$) {
 	my ($allp,$fname) = @_;
 	foreach my $g (keys %$allp) {
-		open OH, ">>$fname.$g" or die "Error opening $fname.$g\n";
+		open OH, ">>:encoding(utf8)", "$fname.$g" or die "Error opening $fname.$g\n";
 		my $gp = $allp->{$g}; 
 		foreach my $p (keys %$gp) {
 			my $pp = $gp->{$p};
@@ -264,7 +264,7 @@ sub fwrite_patts(\%$) {
 sub fwrite_patts_last(\%$) {
 	my ($allp,$fname) = @_;
 	foreach my $g (keys %$allp) {
-		open OH, ">>$fname.$g" or die "Error opening $fname.$g\n";
+		open OH, ">>:encoding(utf8)", "$fname.$g" or die "Error opening $fname.$g\n";
 		my $gp = $allp->{$g};
 		print OH "TOTAL\n";
 		foreach my $p (keys %$gp) {
@@ -285,7 +285,7 @@ sub fwrite_patts_last(\%$) {
 
 sub fread_gpatts(\%$) {
 	my ($gp,$fname) = @_;
-	open IH, "$fname" or die "Error opening $fname\n";
+	open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";
 	
 	my $l=<IH>;
 	chomp $l;
@@ -2433,7 +2433,7 @@ sub find_rulegroups_before($$$){
 
 sub fread_rulegroups($){
 	my ($iname)=@_;
-	open IH, "$iname" or die "Error opening $iname\n";
+	open IH, "<:encoding(utf8)", "$iname" or die "Error opening $iname\n";
 	%inset=();
 	%outset=();
 	%confset=();
@@ -2466,7 +2466,7 @@ sub fread_rulegroups($){
 
 sub fwrite_rulegroups($){
 	my ($oname)=@_;
-	open OH, ">$oname" or die "Error opening $oname\n";
+	open OH, ">:encoding(utf8)", "$oname" or die "Error opening $oname\n";
 	foreach my $setnum (sort keys %inset) {
 		my @inlist = sort keys %{$inset{$setnum}};
 		map s/ /_/g, @inlist;
@@ -2484,7 +2484,7 @@ sub fwrite_rulegroups($){
 
 sub find_rulepairs(\%$){
 	my ($dictp,$oname)=@_;
-	open OH, ">$oname" or die "Error opening $oname\n";
+	open OH, ">:encoding(utf8)", "$oname" or die "Error opening $oname\n";
 	my %rulepairs;
 	my %bigrams;
 	foreach my $word (keys %$dictp) {
@@ -2554,7 +2554,7 @@ sub find_rulepairs(\%$){
 
 sub fread_rulepairs($) {
 	my ($rname)=shift @_;
-	open IH, "$rname" or die "Error opening $rname\n";
+	open IH, "<:encoding(utf8)", "$rname" or die "Error opening $rname\n";
 	%rulepairs=();
 	while (<IH>) {
 		chomp;

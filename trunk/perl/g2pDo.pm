@@ -45,7 +45,7 @@ sub load_file($$) {
 sub import_file($$) {
 	my ($ftype,$fh) = @_;
 	print "-- Enter import_file: $ftype, copy $fh to $cdir/$ftype\n" if $debug;
-	open IH, ">$cdir/$ftype" or die;
+	open IH, ">:encoding(utf8)","$cdir/$ftype" or die;
 	while (<$fh>) { print IH }
 	close IH; close $fh;
 	addstate("import;$ftype;$fh");

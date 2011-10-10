@@ -56,10 +56,10 @@ sub do_rules($$$) {
 	if ( -e "$outrules" ) {
 		system "rm $outrules";
 	}
-	open RH, ">$outrules" or die "Error opening $outrules";
+	open RH, ">:encoding(utf8)", "$outrules" or die "Error opening $outrules";
 
 	$rtype="olist";
-	open GH, "$graphs" or die "Error opening $graphs";
+	open GH, "<:encoding(utf8)", "$graphs" or die "Error opening $graphs";
 	while (my $g=<GH>) {
 		chomp $g;
 		#%rule=();
@@ -69,7 +69,7 @@ sub do_rules($$$) {
 		system("time ./g2popt extract $g $inpatts.$g $outrules.$g -u 2 2 current/groups");  	#fix later
 		#fgen_rulegroups_single_large($g,"$inpatts.$g","$outrules.$g");
 		#fwrite_rules_olist("$outrules.$g");
-		open TH, "$outrules.$g";
+		open TH, "<:encoding(utf8)", "$outrules.$g";
 		while (<TH>) {
 			chomp;
 			print RH "$_\n";
@@ -82,7 +82,7 @@ sub do_rules($$$) {
 	#%numfound=();
 	#fgen_rulegroups_single_large("0","$inpatts.0","$outrules.0");
 	#fwrite_rules_olist("$outrules.0");
-	#open TH, "$outrules.0";
+	#open TH, "<:encoding(utf8)", "$outrules.0";
 	#while (<TH>) {
 	#	chomp;
 	#	print RH "$_\n";
@@ -510,7 +510,7 @@ sub do_full_run_prealigned($$$$$$$$$$$\@\@$$) {
 
 sub append_results ($$$) {
 	my ($inresult,$n,$outresult)=@_;
-	open IH, $inresult or die "Error opening $inresult";
+	open IH, "<:encoding(utf8)", $inresult or die "Error opening $inresult";
 	my ($graphacc,$graphcor,$wordacc);
 	while (<IH>) {
 		chomp;
@@ -526,7 +526,7 @@ sub append_results ($$$) {
 	}
 	close IH;
 	
-	open OH, ">>$outresult" or die "Error opening $outresult\n";
+	open OH, ">>:encoding(utf8)", "$outresult" or die "Error opening $outresult\n";
 	print OH "$n $graphcor $graphacc $wordacc\n";
 	close OH;
 }
@@ -534,7 +534,7 @@ sub append_results ($$$) {
 sub do_result_set ($\@\@$){
 	my ($resultid,$plistp,$nlistp,$outresult)=@_;
 	foreach my $p (@$plistp) {
-		open OH, ">$resultid.$p" or die "Error opening $resultid.$p";
+		open OH, ">:encoding(utf8)", "$resultid.$p" or die "Error opening $resultid.$p";
 		foreach my $n (@$nlistp) {
 			append_results "$resultid.$p.$n",$n,"$resultid.$p";
 		}

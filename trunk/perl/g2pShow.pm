@@ -125,7 +125,7 @@ sub show_soundButton($$$$) {
 sub show_sounds(){
 	local %sounds;
 	read_sounds(%sounds);
-        open CATS,$catt or die;
+        open CATS,"<:encoding(utf8)",$catt or die;
         my $max = 7; my @tdarray;
         #print start_table({-border=>undef});
         print start_table;
@@ -164,7 +164,7 @@ sub show_sounds(){
 sub show_stable($){
 	my $tname = shift @_;
 	print start_table({-align=>'left'});
-	open CATS,$catt or die;
+	open CATS,"<:encoding(utf8)",$catt or die;
 	my $max = 7; 
 	while (<CATS>) {
 		chomp;
@@ -385,7 +385,7 @@ sub show_listen(){
 	local %sounds;
 	read_sounds(%sounds);
 	print start_table;
-	open CATS,$catt or die;
+	open CATS,":encoding(utf8)",$catt or die;
 	my $max = 7; 
 	while (<CATS>) {
 		chomp;

@@ -459,7 +459,7 @@ sub is_mincomp($$$) {
 sub create_tree_dotfile($$$$) {
 	my ($gtreep,$gname,$showmin,$fname)=@_;
 	
-	open FH, ">$fname" or die "Error writing to $fname\n";
+	open FH, ">:encoding(utf8)","$fname" or die "Error writing to $fname\n";
 	print FH "digraph G\n {\nlabel=\"$gname\"\n";
 	#print FH "digraph G\n {\n";
 	my @all_vertices =$$gtreep->vertices();
@@ -806,7 +806,7 @@ sub fread_gpatts_tree($$$) {
 	my ($g,$fname,$gtreep) = @_;
 	
 	%poswords=();
-	open IH, "$fname" or die "Error opening $fname\n";
+	open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";
 	my $num=0;
 	while (<IH>) {
 		chomp;
@@ -2314,7 +2314,7 @@ sub traverse_rules($$) {
 		unshift @rlist,$v;
 	}
 	
-	open OH, ">$fname" or die "Error opening $fname\n";
+	open OH, ">:encoding(utf8)", "$fname" or die "Error opening $fname\n";
 	$i=0;
 	foreach my $r (@rlist) {
 		my $vout = get_single_outcome($gtreep,$r);
@@ -2803,7 +2803,7 @@ sub fbuild_tree($$$) {
 		select($tmpFH);
 	}
 	if ($cnt==0) {
-		open OH, ">$rfn" or die "Error opening $rfn\n";
+		open OH, ">:encoding(utf8)", "$rfn" or die "Error opening $rfn\n";
 		print OH "$g;;;0;0\n";
 		close OH;
 	} else {

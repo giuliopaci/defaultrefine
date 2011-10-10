@@ -795,7 +795,7 @@ sub add_gnull_list(\%\%) {
 sub fwrite_gnull_list(\%$) {
 	my ($gnullp,$fname) = @_;
 	print "-- Enter fwrite_gnull_list: $fname\n" if $debug;
-	open OH, ">$fname" or die;
+	open OH, ">:encoding(utf8)", "$fname" or die;
 	while (my ($find,$replace)=each %$gnullp){
 		print OH "$find;$replace\n";
 	}
@@ -805,7 +805,7 @@ sub fwrite_gnull_list(\%$) {
 sub fread_gnull_list($\%) {
 	my ($fname,$gnullp) = @_;
 	print "-- Enter fread_gnull_list: $fname\n" if $debug;
-	open IH, "$fname" or die "Error opening $fname\n";
+	open IH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";
 	%$gnullp=();
 	while (<IH>) {
 		chomp;
@@ -921,7 +921,7 @@ sub align_dict(\%\%\%\%$) {
 sub fread_align($\%\%) {
 	my ($fname,$agdp,$apdp) = @_;
 	print "-- Enter fread_align: $fname\n" if $debug;
-	open IH, "$fname" or die "Cannot read file $fname\n";
+	open IH, "<:encoding(utf8)", "$fname" or die "Cannot read file $fname\n";
 	%$agdp = (); %$apdp = (); my %dict=();
 	while (<IH>) {
 		chomp;
@@ -987,7 +987,7 @@ sub fread_align($\%\%) {
 sub fwrite_align($\%\%\%) {
 	my ($fname,$dictp,$agdp,$apdp) = @_;
 	print "-- Enter fwrite_align: $fname\n" if $debug;
-	open OH, ">$fname" or die;
+	open OH, ">:encoding(utf8)", "$fname" or die;
 	foreach my $w (sort keys %$dictp){
 		if ($dictType==$doubleType{'pos_one'}) {
 			$towrite = $w;
@@ -1029,7 +1029,7 @@ sub fwrite_align($\%\%\%) {
 sub fexpand_write_align($\%\%\%) {
 	my ($fname,$dictp,$agdp,$apdp) = @_;
 	print "-- Enter fwrite_align: $fname\n" if $debug;
-	open OH, ">$fname" or die;
+	open OH, ">:encoding(utf8)", "$fname" or die;
 	foreach my $w (sort keys %$dictp){
 		my $towrite = $w;
 		$towrite =~ s/^(.*)_(.*)$/$1/g;
@@ -1102,7 +1102,7 @@ sub falign_dict($$$$) {
 sub fcmp_aligned($$$) {
 	my ($a1,$a2,$resname) = @_;
 	print "-- Enter fcmp_aligned: $a1, $a2,$resname\n" if $debug;
-	open OH, ">$resname" or die "Error opening $resname\n";
+	open OH, ">:encoding(utf8)", "$resname" or die "Error opening $resname\n";
 	
 	local (%agd1,%apd1,%agd2,%apd2);	
 	fread_align($a1,%agd1,%apd1);
@@ -1141,7 +1141,7 @@ sub fcmp_aligned($$$) {
 sub fprobs_from_aligned ($) {
 	my $dname = shift @_;
 	print "-- Enter fprobs_from_aligned: $dname\n" if $debug;
-	open FH, "$dname" or die;
+	open FH, "<:encoding(utf8)", "$dname" or die;
 	init_counts; 
 	while (<FH>) {
 		@line = split ";",$_;
@@ -1158,7 +1158,7 @@ sub fprobs_from_aligned ($) {
 sub fadd_aligned($$$) {
 	my ($word,$sound,$dname) = @_;
 	print "-- Enter fadd_aligned: $word,$sound,$dname\n" if $debug;
-	open FP, ">>$dname" or die;
+	open FP, ">>:encoding(utf8)", "$dname" or die;
 	fprobs_from_aligned($dname);
 	my %gnulls=();
 	fread_gnull_list($glist,%gnulls);
@@ -1450,15 +1450,15 @@ sub compare_accuracy($$$$$$$) {
 	fread_dict($d1name,%dict1,%stat1);
 	fread_dict($d2name,%dict2,%stat2);
 	
-	open RH, ">$resname" or die "Error opening output file $resname";
+	open RH, ">:encoding(utf8)", "$resname" or die "Error opening output file $resname";
 	if ($conf==1) {
-		open CH, ">$resname.confusion" or die "Error opening output file $resname.confusion";
+		open CH, ">:encoding(utf8)", "$resname.confusion" or die "Error opening output file $resname.confusion";
 	}
 	if ($apairs==1) {
-		open AH, ">$resname.aligned" or die "Error opening output file $resname.confusion";
+		open AH, ">:encoding(utf8)", "$resname.aligned" or die "Error opening output file $resname.confusion";
 	}
 	if ($varinf==1) {
-		open VH, ">$resname.variants" or die "Error opening output file $resname.variants";
+		open VH, ">:encoding(utf8)", "$resname.variants" or die "Error opening output file $resname.variants";
 	}
 	my (%var,%single)=((),());
 	my (%pcorr,%pinsert,%pdelete,%pwrong)=((),(),(),());

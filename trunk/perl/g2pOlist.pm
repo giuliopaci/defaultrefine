@@ -29,7 +29,7 @@ sub fread_rules_olist($) {
 		
 	my $fname = shift @_;
 	print "-- Enter fread_rules_olist: $fname\n" if $debug;
-	open RH, "$fname" or die "Error opening $fname\n";
+	open RH, "<:encoding(utf8)", "$fname" or die "Error opening $fname\n";
 
 	%rule = ();
 	%rorder=();
@@ -67,7 +67,7 @@ sub fwrite_rules_olist($) {
 		
 	my $fname = shift @_;
 	print "-- Enter fwrite_rules_olist: $fname\n" if $debug;
-	open OH, ">$fname" or die;
+	open OH, ">:encoding(utf8)", "$fname" or die;
 	
 	foreach my $g (sort keys %rorder) {
 		$deleted=0;
@@ -230,7 +230,7 @@ sub predict_one_wspecific($$) {
 sub id_pos_errors($$$$\%) {
 	my ($sf,$netcnt,$actcnt,$cutoff,$errp) = @_;
         
-	open IH, "$sf" or die "Error reading $sf\n";
+	open IH, "<:encoding(utf8)", "$sf" or die "Error reading $sf\n";
 
 	my %single_rules=();
         while (<IH>) {
@@ -266,7 +266,7 @@ sub id_pos_errors($$$$\%) {
 sub fwrite_patts_olist(\%$) {
 	my ($allp,$fname) = @_;
 	foreach my $g (keys %$allp) {
-		open OH, ">>$fname.$g" or die "Error opening $fname.$g\n";
+		open OH, ">>:encoding(utf8)", "$fname.$g" or die "Error opening $fname.$g\n";
 		my $gp = $allp->{$g}; 
 		foreach my $pat (keys %$gp) {
 			print OH "$pat\n";
@@ -597,7 +597,7 @@ sub rulegroups_from_pats_olist($$\%\%) {
 	#dbmopen(%words_done,"db_words_done",0666) || die "Cannot open db db_words_done";
 
 	#my $printnum=0;
-	#open OH, ">errors.tmp.$g" or die;
+	#open OH, ">:encoding(utf8)", "errors.tmp.$g" or die;
 	
 	my $from=1;
 	my $to=$cmax;
@@ -736,7 +736,7 @@ sub rulegroups_from_pats_olist_large($$\%\%$) {
 	
 	if ($ngram==1) {
 		#temporary file created to write probabilities - integrate better once tested
-		open TH, ">$rulefile.prob" or die "Error opening $rulefile.prob";
+		open TH, ">:encoding(utf8)", "$rulefile.prob" or die "Error opening $rulefile.prob";
 	}
 
 	my $cwin=4;
@@ -746,7 +746,7 @@ sub rulegroups_from_pats_olist_large($$\%\%$) {
 
 	#my $printnum=0;
 	if ($find_single==1) {
-		open EH, ">$rulefile.single" or die;
+		open EH, ">:encoding(utf8)", "$rulefile.single" or die;
 	}
 
 	my $from=1;
@@ -902,7 +902,7 @@ sub rulegroups_from_pats_olist_large_wspecific($$$\%\%$) {
 	
 	my ($word,$g,$cmax,$possiblep,$words_notp,$rulefile) = @_;
 	print "<p>-- Enter rulegroups_from_pats_olist_large_wspecific [$g] [$cmax] [$rulefile]\n" if $debug;
-	open OH, ">$rulefile" or die "Error opening $rulefile";	
+	open OH, ">:encoding(utf8)", "$rulefile" or die "Error opening $rulefile";	
 	
 	my $cwin=2;
 	$grulenum=0;
@@ -912,7 +912,7 @@ sub rulegroups_from_pats_olist_large_wspecific($$$\%\%$) {
 
 	#my $printnum=0;
 	if ($find_single==1) {
-		open EH, ">$rulefile.single" or die;
+		open EH, ">:encoding(utf8)", "$rulefile.single" or die;
 	}
 
 	my $from=1;
@@ -1107,7 +1107,7 @@ sub fgen_rulegroups_single_large($$$) {
 		$rorder{$g}[0]="-$g-";
 		$numfound{"-$g-"}=0;
 		print "$g:\t[0]\t[-$g-] --> 0\n"; #if $debug;
-		#open OH, ">$rulefile" or die "Error opening $rulefile\n";
+		#open OH, ">:encoding(utf8)", "$rulefile" or die "Error opening $rulefile\n";
 		#print OH "$g;;;0;0;0\n";
 		#close OH;
 	}
@@ -1145,7 +1145,7 @@ sub fgen_rulegroups_single_large_wspecific($$$$) {
 		$rule{"-$g-"} = "0";
 		$rorder{$g}[0]="-$g-";
 		print "$g:\t[0]\t[-$g-] --> 0\n"; #if $debug;
-		open OH, ">$rulefile" or die "Error opening $rulefile\n";
+		open OH, ">:encoding(utf8)", "$rulefile" or die "Error opening $rulefile\n";
 		print OH "$g;;;0;0;0\n";
 		close OH;
 	}
@@ -1287,7 +1287,7 @@ sub first_out($$) {
 
 sub fappend_gpatts(\%$) {
 	my ($patp,$fname) = @_;
-	open IH, ">>$fname" or die "Error reading IH";
+	open IH, ">>:encoding(utf8)", "$fname" or die "Error reading IH";
 	foreach my $pat (keys %$patp) {
 		$out = $patp->{$pat};
 		print IH "$out; $pat\n";
@@ -1447,9 +1447,9 @@ sub olist_add_upto_sync($$$$$$$$$$$) {
 	if ($use_align==0) {
 		fprobs_from_aligned($adict);
 	}
-	open DIH, "$prev_dict" or die "Error opening $prev_dict\n";
-	open DOH, ">$new_dict" or die "Error opening $new_dict\n";
-	open UOH, ">$used_dict" or die "Error opening $used_dict\n";
+	open DIH, "<:encoding(utf8)", "$prev_dict" or die "Error opening $prev_dict\n";
+	open DOH, ">:encoding(utf8)", "$new_dict" or die "Error opening $new_dict\n";
+	open UOH, ">:encoding(utf8)", "$used_dict" or die "Error opening $used_dict\n";
 	
 	while ($inc < $sync) {
 		my $line = <DIH>;
@@ -1498,7 +1498,7 @@ sub olist_add_upto_sync($$$$$$$$$$$) {
 
 sub create_tree_dotfile($$$) {
 	my ($gtreep,$gname,$fname)=@_;
-	open FH, ">$fname" or die "Error writing to $fname\n";
+	open FH, ">:encoding(utf8)", "$fname" or die "Error writing to $fname\n";
 	print FH "digraph G\n {\nlabel=\"$gname\"\n";
 	
 	my @all_vertices =$$gtreep->vertices();
@@ -1538,7 +1538,7 @@ sub fwrite_olist_gtree($$) {
 		@vlist = $$gtreep->vertices();
 	}
 	my %vdone=();
-	open OH, ">$gtreefn" || die "Error opening $gtreefn\n";
+	open OH, ">:encoding(utf8)", "$gtreefn" || die "Error opening $gtreefn\n";
 	while (scalar @vlist>=1) {
 		$v = shift @vlist;
 		$vout = $$gtreep->get_attribute("outcome",$v);
@@ -1561,7 +1561,7 @@ sub fread_olist_gtree($$) {
 	print "Entering fread_olist_gtree: $gtreefn\n";
 	my %vdone=();
 	
-	open IH, "$gtreefn" || die "Error opening $gtreefn\n";
+	open IH, "<:encoding(utf8)","$gtreefn" || die "Error opening $gtreefn\n";
 	while (<IH>) {
 		chomp;
 		my @line = split /;/,$_;
@@ -1711,8 +1711,8 @@ sub olist_fast_file ($$$$) {
 	my %gnulls=();
 	fread_gnull_list($gnullsfn,%gnulls);
 	
-	open IH, "$wordlist" or die "Error opening file: $wordlist\n";
-	open OH, ">$newdict" or die "Error opening file: $newdict\n";
+	open IH, "<:encoding(utf8)","$wordlist" or die "Error opening file: $wordlist\n";
+	open OH, ">:encoding(utf8)","$newdict" or die "Error opening file: $newdict\n";
 	
 	while (<IH>) {
 		chomp;

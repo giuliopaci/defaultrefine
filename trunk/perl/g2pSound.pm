@@ -21,7 +21,7 @@ sub read_sounds(\%) {
         my $sp = shift @_;
 	print "-- Enter read_sounds\n" if $debug;
 	%$sp = ();
-        open SOUNDS,$sndt or die;
+        open SOUNDS,"<:encoding(utf8)",$sndt or die;
         while (<SOUNDS>) {
                 chomp;
                 @line = split "_";
@@ -54,7 +54,7 @@ sub create_sound($$) {
 	my $name = $word.substr(rand,2,4);
 
 	$outdir = "$sdir/tmp/$ename";
-	open PF, ">tmp.praat" or die;
+	open PF, ">:encoding(utf8)","tmp.praat" or die;
 	foreach my $i (0 .. $#toplay) {
 		my $phone = $sounds{$toplay[$i]}[1];
 		print PF "Read from file... $sdir/$phone.wav\n";
