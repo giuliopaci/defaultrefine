@@ -6,17 +6,17 @@ libraries and then compile with ./configure, make and make install.
 
 See ./configure --help for more options.
 
+For example:
+
+    $ sh autogen.sh
+    $ ./configure
+    $ make
+    $ make install
+
 About
 -----
 
     API for Marelie Davel's G2P library.
-
-Dependencies
-------------
-
-    $ sudo apt-get install libboost-python-dev
-	OR
-    $ sudo yum install boost boost-devel boost-python
 
 Description
 -----------
