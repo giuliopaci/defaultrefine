@@ -1,0 +1,31 @@
+About
+-----
+
+    The Python G2P module is a Python extension to the C++ G2P library originally written
+    by Marelie Davel.
+
+Getting started
+---------------
+
+    Using the Python shell:
+
+        $ python
+        >>> from g2p import G2P
+        >>> from dictionaryfile import DictionaryFile
+        >>> g2p = G2P()
+        >>> dict = DictionaryFile().from_file('test_data/english.dict')
+        >>> g2p.set_dictionary(dict)
+        >>> g2p.update_rules()
+        >>> phones = g2p.predict_pronunciation('hello')
+        >>> print "result:", phones
+
+    Run regression test cases:
+
+        $ python g2p.py
+
+Contact
+-------
+
+    Questions and comments go to:
+
+        rcarlson.cs@gmail.com
