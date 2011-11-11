@@ -796,9 +796,9 @@ class G2PTestCase(unittest.TestCase):
             test_words.append(w.get_text())
         test_count = len(test_words)
         test_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, show_results=False)
-        log.info("Train results: [%d/%d] %d%% correct" \
+        log.info("Train set results: [%d/%d] %d%% correct" \
                  %(train_count, train_correct, (float(train_correct) / float(train_count)) * 100))
-        log.info("Test results: [%d/%d] %d%% correct" \
+        log.info("Test set results: [%d/%d] %d%% correct" \
                  %(test_count, test_correct, (float(test_correct) / float(test_count)) * 100))
         # TODO: "correct_count" below reflects current ability of the system.
         #self.assertTrue(correct >= 3866)
