@@ -703,7 +703,7 @@ class G2PTestCase(unittest.TestCase):
     """
     Test case for the G2P object.
     """
-    def run_regression(self, g2p, dict_words, test_words, unittest_assert=True):
+    def run_regression(self, g2p, dict_words, test_words, unittest_assert=True, show_results=True):
         """
         Run regression test and report results.
         @param g2p: G2P object
@@ -731,8 +731,9 @@ class G2PTestCase(unittest.TestCase):
                                   %(t_word, ' '.join(phones), ' '.join(pred_phones)))
         word_count = len(test_words)
         correct_count = word_count - failed_count
-        log.info("Test results: [%d/%d] %d%% correct" \
-                 %(word_count, correct_count, (float(correct_count) / float(word_count)) * 100))
+        if show_results:
+            log.info("Test results: [%d/%d] %d%% correct" \
+                     %(word_count, correct_count, (float(correct_count) / float(word_count)) * 100))
         if unittest_assert:
             self.assertEquals(correct_count, word_count)
         return correct_count
@@ -777,16 +778,30 @@ class G2PTestCase(unittest.TestCase):
         Test with Setswana data set.
         """
         log = Application().get_log()
-        dict_words = DictionaryFile().from_file('test_data/setswana.dict')
-        test_words = []
-        for w in dict_words:
-            test_words.append(w.get_text())
+        all_dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.dict')
+        train_dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.shuf.3988.dict')
+        test_dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.shuf.1024.dict')
         g2p = G2P()
-        g2p.set_dictionary(copy.deepcopy(dict_words))
+        g2p.set_dictionary(copy.deepcopy(train_dict))
         g2p.update_rules()
-        correct = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
+        # Predict train set words
+        test_words = []
+        for w in train_dict:
+            test_words.append(w.get_text())
+        train_count = len(test_words)
+        train_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, show_results=False)
+        # Predict test set words
+        test_words = []
+        for w in test_dict:
+            test_words.append(w.get_text())
+        test_count = len(test_words)
+        test_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, show_results=False)
+        log.info("Train results: [%d/%d] %d%% correct" \
+                 %(train_count, train_correct, (float(train_correct) / float(train_count)) * 100))
+        log.info("Test results: [%d/%d] %d%% correct" \
+                 %(test_count, test_correct, (float(test_correct) / float(test_count)) * 100))
         # TODO: "correct_count" below reflects current ability of the system.
-        self.assertTrue(correct >= 3866)
+        #self.assertTrue(correct >= 3866)
 
     def test_update_rules_async(self):
         """
@@ -830,5 +845,5 @@ if __name__ == "__main__":
     #suite.addTest(G2PTestCase('test_pickling'))
     #suite.addTest(G2PTestCase('test_update_rules_async'))
     # The following unit test is disabled per issue #5
-    #suite.addTest(G2PTestCase('test_setswana'))
+    suite.addTest(G2PTestCase('test_setswana'))
     unittest.TextTestRunner().run(suite)
