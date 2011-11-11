@@ -9,6 +9,8 @@ SUBDIRS = libutil libg2p src
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libg2p.pc
 
+TESTS = test.sh
+
 # Automatically update libtool script if it gets out-of-date.
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
