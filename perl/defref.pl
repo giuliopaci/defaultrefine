@@ -95,6 +95,10 @@ sub cl_find_rules_all ($$$) {
 	print "Features file:\t$featf\nPattsfile:\t$pattsf\nRules file:\t$rf\n";
 	my @feats;
 	fread_graphs($featf,@feats);
+        my %feat_hash = map {$_,1} @feats;
+        if (! exists $feat_hash{'0'}) {
+  		push @feats,'0';
+	}
 	foreach my $f (@feats) {
 		find_rules_single($f,"$pattsf.$f","$rf.$f");
 		my $t = gmtime();

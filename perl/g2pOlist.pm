@@ -15,6 +15,7 @@ BEGIN {
 	# Global vars
 	$debug = 0;
 	$msg = 0;
+	$max_len_before_stopping = 40;
 	
 	use Exporter();
 	@ISA = qw(Exporter);
@@ -690,7 +691,7 @@ sub rulegroups_from_pats_olist($$\%\%) {
 		
 			my $newlen = (length $nr)-2;
 			if ($newlen>($to-$cwin)) {
-				if ($newlen < 18) {
+				if ($newlen < $max_len_before_stopping) {
 					$from = $to+1;
 					$to = $to+$cwin;
 					print "Adding contexts from [$from] to [$to]\n";
@@ -856,7 +857,7 @@ sub rulegroups_from_pats_olist_large($$\%\%$) {
 			my $limit_size=0;
 			#don't increase context size while testing effect of limiting context size
 			if ($newlen>($to-$cwin)&&($limit_size==0)) {
-				if ($newlen < 18) {
+				if ($newlen < $max_len_before_stopping) {
 					$from = $to+1;
 					$to = $to+$cwin;
 					print "Adding contexts from [$from] to [$to]\n";
@@ -1007,7 +1008,7 @@ sub rulegroups_from_pats_olist_large_wspecific($$$\%\%$) {
 			my $limit_size=1;
 			#don't increase context size while testing effect of limiting context size
 			if ($newlen>($to-$cwin)&&($limit_size==0)) {
-				if ($newlen < 18) {
+				if ($newlen < $max_len_before_stopping) {
 					$from = $to+1;
 					$to = $to+$cwin;
 					print "Adding contexts from [$from] to [$to]\n";
