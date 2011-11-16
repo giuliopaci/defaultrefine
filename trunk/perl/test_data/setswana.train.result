@@ -1,0 +1,8 @@
+====================== HTK Results Analysis =======================
+  Date: Wed Nov 16 03:32:59 2011
+  Ref : setswana.train.perl_dict.mlf
+  Rec : setswana.train.recreated.perl_dict.mlf
+------------------------ Overall Results --------------------------
+SENT: %Correct=100.00 [H=3988, S=0, N=3988]
+WORD: %Corr=100.00, Acc=100.00 [H=25885, D=0, S=0, I=0, N=25885]
+===================================================================

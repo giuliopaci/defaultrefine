@@ -1,0 +1,9 @@
+  1024   1024  18445 setswana.test.perl_dict
+  1024   1024  18441 setswana.test.recreated.perl_dict
+  3988   3988  71681 setswana.train.perl_dict
+  3988   3988  71681 setswana.train.recreated.perl_dict
+ 10024  10024 180248 total
+setswana.test.result:PHONE: %Corr=99.82, Acc=99.80 [H=6648, D=5, S=7, I=1, N=6660]
+setswana.train.result:PHONE: %Corr=100.00, Acc=100.00 [H=25885, D=0, S=0, I=0, N=25885]
+setswana.test.result:WORD: %Correct=98.93 [H=1013, S=11, N=1024]
+setswana.train.result:WORD: %Correct=100.00 [H=3988, S=0, N=3988]
