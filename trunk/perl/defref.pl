@@ -122,7 +122,7 @@ sub print_usage () {
 	print "Usage: predict <data> <rules> <gnulls>\n";
 	print "       predict_info <data> <rules> <gnulls>\n";
 	print "       predict_file <datafile> <rules> <gnulls> <newdict> [ <ignore-characters> ]\n";
-	print "       align <datafile> <aligned_datafile> <gnulls>\n";
+	print "       align <datafile> <feature_file> <class_file> <aligned_datafile> <gnulls>\n";
 	print "       patts <feature_file> <aligned_datafile> <patts_prefix>\n";
 	print "       rules_single <f> <pattsfile> <newrules>\n"; 
 	print "       rules_all <featurelist> <patts_prefix> <newrules_prefix>\n"; 
