@@ -1,0 +1,41 @@
+Aligned transcription: difenitAhara.lab vs difenitAhara.rec
+ LAB: d i f E n i H a r a 
+ REC: d i f E n i I a r a 
+Aligned transcription: ditAhupu.lab vs ditAhupu.rec
+ LAB: d i I u F u 
+ REC: d i H u F u 
+Aligned transcription: ditlhatshana.lab vs ditlhatshana.rec
+ LAB: d i P a Q a n a 
+ REC: d i P a R a n a 
+Aligned transcription: golagane.lab vs golagane.rec
+ LAB: x O l a x a n E 
+ REC: x O l a x   n E 
+Aligned transcription: maano.lab vs maano.rec
+ LAB: m a a n O 
+ REC: m   a n O 
+Aligned transcription: moAa.lab vs moAa.rec
+ LAB: m O S a 
+ REC: m O   a 
+Aligned transcription: paakanyo.lab vs paakanyo.rec
+ LAB: F a B a   J O 
+ REC: F a B a n j O 
+Aligned transcription: seAabo.lab vs seAabo.rec
+ LAB: s E S a b O 
+ REC: s E   a b O 
+Aligned transcription: tlhaloganya.lab vs tlhaloganya.rec
+ LAB: P a l O x a n j a 
+ REC: P a l O x a   J a 
+Aligned transcription: tlwaelo.lab vs tlwaelo.rec
+ LAB: P w a E l O 
+ REC: M w a E l O 
+Aligned transcription: watAhe.lab vs watAhe.rec
+ LAB: w a H E 
+ REC: w a I E 
+====================== HTK Results Analysis =======================
+  Date: Wed Nov 16 03:33:05 2011
+  Ref : setswana.test.perl_dict.mlf
+  Rec : setswana.test.recreated.perl_dict.mlf
+------------------------ Overall Results --------------------------
+SENT: %Correct=98.93 [H=1013, S=11, N=1024]
+WORD: %Corr=99.82, Acc=99.80 [H=6648, D=5, S=7, I=1, N=6660]
+===================================================================
