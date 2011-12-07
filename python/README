@@ -1,27 +1,34 @@
 About
 -----
 
-    The Python G2P module is a Python extension to the C++ G2P library originally written
-    by Marelie Davel.
+    The Python G2P module is a Python extension to the C++ G2P library 
+    originally written by Marelie Davel.
 
 Getting started
 ---------------
 
-    Be sure the G2P library is built and in your library path (eg. LD_LIBRARY_PATH).
-    For more information see 'cpp/README'.
+    Be sure the G2P library is built and in your library path with 
+    something like the following:
 
-    Using the Python shell from the project "python" directory execute the following:
+        $ export LD_LIBRARY_PATH='/usr/local/lib'
+
+    For more information about building the G2P library see 'cpp/README'.
+
+    Using the Python shell from the project "python" directory execute the 
+    following:
 
         $ python
         >>> from g2p import *
         >>> g2p = G2P()
-        >>> dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.dict')
+        >>> dict = \
+            DictionaryFile().from_file('test_data/setswana-dict/setswana.dict')
         >>> g2p.set_dictionary(dict)
         >>> g2p.update_rules()
         >>> phones = g2p.predict_pronunciation('hello')
         >>> print "result:", phones
 
-    Run regression test cases:
+    To run regression test cases execute the following from whithin the 
+    "python/g2p" directory:
 
         $ python g2p.py
 
