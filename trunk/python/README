@@ -25,6 +25,13 @@ Getting started
 
         $ python g2p.py
 
+Installing
+----------
+
+    From the "python" directory execute the following with super-user privilages:
+    
+    $ python setup.py install
+
 Contact
 -------
 
