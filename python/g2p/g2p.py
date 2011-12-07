@@ -153,7 +153,7 @@ class G2P:
         """
         system = platform.system()
         if system == 'Linux':
-            self.g2plib = cdll.LoadLibrary("../cpp/libg2p/.libs/libg2p.so")
+            self.g2plib = cdll.LoadLibrary("libg2p.so")
         elif system == 'Windows':
             self.g2plib = cdll.LoadLibrary("WinG2PDLL.dll")
         else:
@@ -744,7 +744,7 @@ class G2PTestCase(unittest.TestCase):
         """
         log = Application().get_log()
         log.info("G2PTestCase.test_set_dictionary()")
-        words = DictionaryFile().from_file('test_data/g2p-short-regression-test.dict')
+        words = DictionaryFile().from_file('../test_data/g2p-short-regression-test.dict')
         g2p = G2P()
         g2p.set_dictionary(words)
         words2 = g2p.get_dictionary()[:]
@@ -760,14 +760,14 @@ class G2PTestCase(unittest.TestCase):
         """
         log = Application().get_log()
         log.info("G2PTestCase.test_file_io()")
-        SAVE_FILE = "test_data/subset_english.g2p"
+        SAVE_FILE = "../test_data/subset_english.g2p"
         g2p_to_file = G2P()
-        dict_words = DictionaryFile().from_file('test_data/g2p-short-regression-test.dict')
+        dict_words = DictionaryFile().from_file('../test_data/g2p-short-regression-test.dict')
         g2p_to_file.set_dictionary(copy.deepcopy(dict_words))
         g2p_to_file.update_rules()
         pickle.dump(g2p_to_file, open(SAVE_FILE, 'wb'))
         g2p_from_file = pickle.load( open(SAVE_FILE) )
-        test_words = WordFile().from_file('test_data/g2p-short-regression-test.wl')
+        test_words = WordFile().from_file('../test_data/g2p-short-regression-test.wl')
         correct_count = \
             self.run_regression(g2p_from_file, dict_words, test_words, unittest_assert=False)
         # TODO: "correct_count" below reflects current ability of the system.
@@ -778,9 +778,9 @@ class G2PTestCase(unittest.TestCase):
         Test with Setswana data set.
         """
         log = Application().get_log()
-        all_dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.dict')
-        train_dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.shuf.3988.dict')
-        test_dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.shuf.1024.dict')
+        all_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.dict')
+        train_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.shuf.3988.dict')
+        test_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.shuf.1024.dict')
         g2p = G2P()
         g2p.set_dictionary(copy.deepcopy(train_dict))
         g2p.update_rules()
@@ -815,16 +815,16 @@ class G2PTestCase(unittest.TestCase):
         log = Application().get_log()
         g2p = G2P()
         # Synchronous test
-        dict_words = DictionaryFile().from_file('test_data/g2p-short-regression-test.dict')
-        test_words = WordFile().from_file('test_data/g2p-short-regression-test.wl')
+        dict_words = DictionaryFile().from_file('../test_data/g2p-short-regression-test.dict')
+        test_words = WordFile().from_file('../test_data/g2p-short-regression-test.wl')
         g2p.set_dictionary(copy.deepcopy(dict_words))
         g2p.update_rules()
         correct_count = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
         # TODO: "correct_count" below reflects current ability of the system.
         self.assertTrue(correct_count >= 2)
         log.info('Adding words words and conducting "in-place" asynchronous update_rules test')
-        dict_words_2 = DictionaryFile().from_file('test_data/g2p-rules-async-2.dict')
-        test_words_2 = WordFile().from_file('test_data/g2p-rules-async-2.wl')
+        dict_words_2 = DictionaryFile().from_file('../test_data/g2p-rules-async-2.dict')
+        test_words_2 = WordFile().from_file('../test_data/g2p-rules-async-2.wl')
         dict_words.extend(dict_words_2)
         g2p.update_rules_async(dict_words)
         while g2p.poll_update_rules_async():

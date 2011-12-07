@@ -7,13 +7,15 @@ About
 Getting started
 ---------------
 
-    Using the Python shell:
+    Be sure the G2P library is built and in your library path (eg. LD_LIBRARY_PATH).
+    For more information see 'cpp/README'.
+
+    Using the Python shell from the project "python" directory execute the following:
 
         $ python
-        >>> from g2p import G2P
-        >>> from dictionaryfile import DictionaryFile
+        >>> from g2p import *
         >>> g2p = G2P()
-        >>> dict = DictionaryFile().from_file('test_data/english.dict')
+        >>> dict = DictionaryFile().from_file('test_data/setswana-dict/setswana.dict')
         >>> g2p.set_dictionary(dict)
         >>> g2p.update_rules()
         >>> phones = g2p.predict_pronunciation('hello')
