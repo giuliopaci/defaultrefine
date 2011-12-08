@@ -22,10 +22,10 @@
 using namespace std;
 
 void print_usage(void) {
-        cout << "Usage: g2popt extract <g> <pattsfile> <rulesfile> [-u <min_kids> <max_groups> <groupsfile]" << endl;
-		cout << "       g2popt predict <word>  <rulesfile> [-i] [-n] [-s] [-g <gnullfile>] [-u <groupsfile>] " << endl;
-		cout << "       g2popt predict_file <wordlist> <rulesfile> <outfile> [-f htk|semicolon] [-i] [-n] [-g <gnullfile>] [-u <groupsfile>]" << endl;
-		cout << "       g2popt id_rules <wordlist> <rulesfile> <aligned_ref_dict> <outfile> [-g <gnullfile>] [-u <groupsfile>]" << endl;
+        cout << "Usage: defaultrefine extract <g> <pattsfile> <rulesfile> [-u <min_kids> <max_groups> <groupsfile]" << endl;
+		cout << "       defaultrefine predict <word>  <rulesfile> [-i] [-n] [-s] [-g <gnullfile>] [-u <groupsfile>] " << endl;
+		cout << "       defaultrefine predict_file <wordlist> <rulesfile> <outfile> [-f htk|semicolon] [-i] [-n] [-g <gnullfile>] [-u <groupsfile>]" << endl;
+		cout << "       defaultrefine id_rules <wordlist> <rulesfile> <aligned_ref_dict> <outfile> [-g <gnullfile>] [-u <groupsfile>]" << endl;
 		cout << "       See separate commands for more info"  << endl;
 }
 
@@ -54,7 +54,7 @@ int main (int argc, char *argv[]) {
 			fgen_rules_opt(params[0],params[1],usegroups,minkids,maxgroups,groupsfile,params[2]);
 			return 0;
 		}
-        cout << "g2popt extract <g> <pattsfile> <rulesfile> [-u <min_kids> <max_groups> <groupsfile>]" << endl;
+        cout << "defaultrefine extract <g> <pattsfile> <rulesfile> [-u <min_kids> <max_groups> <groupsfile>]" << endl;
         cout << "       -u : use groups (default no groups)" << endl;
         cout << "            at least <min_kids> examples (types) before group formed"  << endl;
         cout << "            no more than <max_groups> groups (tokens) per rule"  << endl;
@@ -88,7 +88,7 @@ int main (int argc, char *argv[]) {
         		return 0;
 			}
 		}
-		cout << "g2popt predict <word>  <rulesfile> [-i] [-p] [-s] [-g <gnullfile>] [-u <groupsfile>]" << endl;
+		cout << "defaultrefine predict <word>  <rulesfile> [-i] [-p] [-s] [-g <gnullfile>] [-u <groupsfile>]" << endl;
 		cout << "       -i : print info on rule applied" << endl;
 		cout << "       -g : apply graphemic nulls from <gnullfile>"  << endl;
 		cout << "       -n : leave phonemic nulls, otherwise removed" << endl;
@@ -135,7 +135,7 @@ int main (int argc, char *argv[]) {
 				}
 			}
 		}
-		cout << "g2popt predict_file <wordlist> <rulesfile> <outfile> [-f htk|semicolon] [-i] [-g <gnullfile>] [-u <groupsfile>]" << endl;
+		cout << "defaultrefine predict_file <wordlist> <rulesfile> <outfile> [-f htk|semicolon] [-i] [-g <gnullfile>] [-u <groupsfile>]" << endl;
 		cout << "       -f : select format (default: semicolon)" << endl;
 		cout << "       -i : print info on rule applied" << endl;
 		cout << "       -n : leave nulls (both phonemic and graphemic), otherwise removed" << endl;
@@ -166,7 +166,7 @@ int main (int argc, char *argv[]) {
 				}
 			}
 		}
-		cout << "g2popt id_rules <wordlist> <rulesfile> <ref_dict> <outfile> [-g <gnullfile] [-u <groupsfile>]" << endl;
+		cout << "defaultrefine id_rules <wordlist> <rulesfile> <ref_dict> <outfile> [-g <gnullfile] [-u <groupsfile>]" << endl;
         return 0;
  	}
 
