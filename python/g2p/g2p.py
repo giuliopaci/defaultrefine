@@ -214,6 +214,8 @@ class G2P:
         @rtype: C{boolean}
         """
         is_updating = True
+        if not self.updater.is_alive():
+            return False
         while self.pipe.poll():
             (self.character_map, self.rules) = self.pipe.recv()
             ctype_rules = (c_char_p * len(self.rules))()
@@ -221,6 +223,10 @@ class G2P:
             self.g2plib.set_rules(ctype_rules, len(ctype_rules))
             is_updating = False
         return is_updating
+
+    def abort_update_rules_async(self):
+        #TODO:
+        self.updater.terminate()
 
     def predict_pronunciation(self, word_str):
         """
@@ -789,19 +795,39 @@ class G2PTestCase(unittest.TestCase):
         for w in train_dict:
             test_words.append(w.get_text())
         train_count = len(test_words)
-        train_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, show_results=False)
+        train_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, 
+                                            show_results=False)
         # Predict test set words
         test_words = []
         for w in test_dict:
             test_words.append(w.get_text())
         test_count = len(test_words)
-        test_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, show_results=False)
+        test_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, 
+                                           show_results=False)
         log.info("Train set results: [%d/%d] %d%% correct" \
                  %(train_count, train_correct, (float(train_correct) / float(train_count)) * 100))
         log.info("Test set results: [%d/%d] %d%% correct" \
                  %(test_count, test_correct, (float(test_correct) / float(test_count)) * 100))
         # TODO: "correct_count" below reflects current ability of the system.
         #self.assertTrue(correct >= 3866)
+
+    def test_abort(self):
+        """
+        Test cancelling rule update.
+        """
+        abort_delay = 5
+        log = Application().get_log()
+        setswana_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.dict')
+        g2p = G2P()
+        g2p.set_dictionary(copy.deepcopy(setswana_dict))
+        g2p.update_rules_async(setswana_dict)
+        log.info('Pausing %d second before aborting rule rebuilding' %abort_delay)
+        sleep(abort_delay)
+        log.info('Aborting rule rebuilding')
+        g2p.abort_update_rules_async()
+        while g2p.poll_update_rules_async():
+            log.info("Waiting while rules are updated...")
+            sleep(1)
 
     def test_update_rules_async(self):
         """
@@ -846,4 +872,5 @@ if __name__ == "__main__":
     #suite.addTest(G2PTestCase('test_update_rules_async'))
     # The following unit test is disabled per issue #5
     suite.addTest(G2PTestCase('test_setswana'))
+    suite.addTest(G2PTestCase('test_abort'))
     unittest.TextTestRunner().run(suite)
