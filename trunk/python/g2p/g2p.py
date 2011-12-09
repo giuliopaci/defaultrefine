@@ -709,6 +709,10 @@ class G2PTestCase(unittest.TestCase):
     """
     Test case for the G2P object.
     """
+    TSN_FULL_DICT_PATH = '../test_data/setswana-dict/setswana.dict'
+    TSN_TEST_DICT_PATH = '../test_data/setswana-dict/setswana.shuf.1024.dict'
+    TSN_TRAIN_DICT_PATH = '../test_data/setswana-dict/setswana.shuf.3988.dict'
+
     def run_regression(self, g2p, dict_words, test_words, unittest_assert=True, show_results=True):
         """
         Run regression test and report results.
@@ -750,7 +754,7 @@ class G2PTestCase(unittest.TestCase):
         """
         log = Application().get_log()
         log.info("G2PTestCase.test_set_dictionary()")
-        words = DictionaryFile().from_file('../test_data/g2p-short-regression-test.dict')
+        words = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
         g2p = G2P()
         g2p.set_dictionary(words)
         words2 = g2p.get_dictionary()[:]
@@ -765,28 +769,32 @@ class G2PTestCase(unittest.TestCase):
         Test g2p data reading and writing.
         """
         log = Application().get_log()
-        log.info("G2PTestCase.test_file_io()")
-        SAVE_FILE = "../test_data/subset_english.g2p"
+        log.info("G2PTestCase.test_pickling()")
+        SAVE_FILE = "../test_data/tsn.g2p"
         g2p_to_file = G2P()
-        dict_words = DictionaryFile().from_file('../test_data/g2p-short-regression-test.dict')
+        dict_words = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
         g2p_to_file.set_dictionary(copy.deepcopy(dict_words))
         g2p_to_file.update_rules()
         pickle.dump(g2p_to_file, open(SAVE_FILE, 'wb'))
         g2p_from_file = pickle.load( open(SAVE_FILE) )
-        test_words = WordFile().from_file('../test_data/g2p-short-regression-test.wl')
+        test_words = []
+        for w in dict_words[:20]:
+            test_words.append(w.get_text())
+        test_count = len(test_words)
         correct_count = \
             self.run_regression(g2p_from_file, dict_words, test_words, unittest_assert=False)
-        # TODO: "correct_count" below reflects current ability of the system.
-        self.assertTrue(correct_count >= 2)
+        # TODO: "correct_count" below should equal "test_count"
+        self.assertTrue(correct_count >= 1)
 
     def test_setswana(self):
         """
         Test with Setswana data set.
         """
         log = Application().get_log()
-        all_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.dict')
-        train_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.shuf.3988.dict')
-        test_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.shuf.1024.dict')
+        log.info("G2PTestCase.test_setswana()")
+        all_dict = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
+        train_dict = DictionaryFile().from_file(self.TSN_TRAIN_DICT_PATH)
+        test_dict = DictionaryFile().from_file(self.TSN_TEST_DICT_PATH)
         g2p = G2P()
         g2p.set_dictionary(copy.deepcopy(train_dict))
         g2p.update_rules()
@@ -802,14 +810,14 @@ class G2PTestCase(unittest.TestCase):
         for w in test_dict:
             test_words.append(w.get_text())
         test_count = len(test_words)
-        test_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, 
-                                           show_results=False)
+        correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, 
+                                      show_results=False)
         log.info("Train set results: [%d/%d] %d%% correct" \
                  %(train_count, train_correct, (float(train_correct) / float(train_count)) * 100))
         log.info("Test set results: [%d/%d] %d%% correct" \
-                 %(test_count, test_correct, (float(test_correct) / float(test_count)) * 100))
-        # TODO: "correct_count" below reflects current ability of the system.
-        #self.assertTrue(correct >= 3866)
+                 %(test_count, correct, (float(correct) / float(test_count)) * 100))
+        # TODO: "correct_count" should equal the "test_count"
+        self.assertTrue(correct > 1)
 
     def test_abort(self):
         """
@@ -817,7 +825,8 @@ class G2PTestCase(unittest.TestCase):
         """
         abort_delay = 5
         log = Application().get_log()
-        setswana_dict = DictionaryFile().from_file('../test_data/setswana-dict/setswana.dict')
+        log.info("G2PTestCase.test_abort()")
+        setswana_dict = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
         g2p = G2P()
         g2p.set_dictionary(copy.deepcopy(setswana_dict))
         g2p.update_rules_async(setswana_dict)
@@ -839,38 +848,47 @@ class G2PTestCase(unittest.TestCase):
             5. When update is complete, test second word list pronunciation prediction.
         """
         log = Application().get_log()
+        log.info("G2PTestCase.test_update_rules_async()")
         g2p = G2P()
         # Synchronous test
-        dict_words = DictionaryFile().from_file('../test_data/g2p-short-regression-test.dict')
-        test_words = WordFile().from_file('../test_data/g2p-short-regression-test.wl')
+        dict_words = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
+        test_words = []
+        for w in dict_words[:20]:
+            test_words.append(w.get_text())
+        test_count = len(test_words)
         g2p.set_dictionary(copy.deepcopy(dict_words))
         g2p.update_rules()
         correct_count = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
-        # TODO: "correct_count" below reflects current ability of the system.
-        self.assertTrue(correct_count >= 2)
+        # TODO: "correct_count" below should be 100%
+        self.assertTrue(correct_count > 1)
         log.info('Adding words words and conducting "in-place" asynchronous update_rules test')
-        dict_words_2 = DictionaryFile().from_file('../test_data/g2p-rules-async-2.dict')
-        test_words_2 = WordFile().from_file('../test_data/g2p-rules-async-2.wl')
-        dict_words.extend(dict_words_2)
-        g2p.update_rules_async(dict_words)
+        dict_words_async = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
+        async_test_words = []
+        for w in dict_words[20:40]:
+            async_test_words.append(w.get_text())
+        dict_words.extend(dict_words_async)
+        g2p.update_rules_async(dict_words_async)
         while g2p.poll_update_rules_async():
             log.info("Waiting while rules are updated...")
             # Verify G2P still callable and correct.
             correct_count = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
-            # TODO: "correct_count" below reflects current ability of the system.
-            self.assertTrue(correct_count >= 2)
+            # TODO: "correct_count" below should be 100%
+            self.assertTrue(correct_count > 1)
             sleep(1)
         # Testing with new rules
-        correct_count = self.run_regression(g2p, dict_words_2, test_words_2, unittest_assert=False)
-        # TODO: "correct_count" below reflects current ability of the system.
-        self.assertTrue(correct_count >= 7)
+        correct_count = self.run_regression(g2p, dict_words_async, async_test_words, 
+                                            unittest_assert=False)
+        # TODO: "correct_count" below should equal "test_count"
+        self.assertTrue(correct_count > 1)
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    #suite.addTest(G2PTestCase('test_set_dictionary'))
-    #suite.addTest(G2PTestCase('test_pickling'))
-    #suite.addTest(G2PTestCase('test_update_rules_async'))
-    # The following unit test is disabled per issue #5
+    suite.addTest(G2PTestCase('test_set_dictionary'))
+    suite.addTest(G2PTestCase('test_pickling'))
+    suite.addTest(G2PTestCase('test_update_rules_async'))
     suite.addTest(G2PTestCase('test_setswana'))
     suite.addTest(G2PTestCase('test_abort'))
-    unittest.TextTestRunner().run(suite)
+    result = unittest.TextTestRunner().run(suite)
+    if not result.wasSuccessful():
+        sys.exit(1)
+    sys.exit(0)
