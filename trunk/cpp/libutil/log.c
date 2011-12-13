@@ -29,7 +29,7 @@ int make_time_buf(char *buf)
 
     now = time(NULL);
     tm = localtime(&now);
-    n = strftime(buf, MAX_TIME_SIZE, "%m/%d/%Y %H:%M:%S", tm);
+    n = strftime(buf, MAX_TIME_SIZE, "%m-%d-%Y %H:%M:%S", tm);
     if (n < 0 || n >= MAX_TIME_SIZE) {
         return EIO;
     }
