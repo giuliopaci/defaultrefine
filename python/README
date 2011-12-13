@@ -39,6 +39,14 @@ Installing
     
     $ python setup.py install
 
+Building Windows Installer
+--------------------------
+
+    To build the Windows installer (eg. for use with the NSIS installer in the C++ 
+    library project) execute the following:
+
+    $ python setup.py bdist --format=msi
+
 Contact
 -------
 
