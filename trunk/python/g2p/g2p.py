@@ -225,7 +225,9 @@ class G2P:
         return is_updating
 
     def abort_update_rules_async(self):
-        #TODO:
+        """
+        Abort rule update process.
+        """
         self.updater.terminate()
 
     def predict_pronunciation(self, word_str):
