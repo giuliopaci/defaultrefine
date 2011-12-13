@@ -145,6 +145,7 @@ class G2P:
         self.aligned_dict = None
         self.patterns = None
         self.rules = []
+        self.updater = None
         self.setup_g2plib()
 
     def setup_g2plib(self):
@@ -223,6 +224,14 @@ class G2P:
             self.g2plib.set_rules(ctype_rules, len(ctype_rules))
             is_updating = False
         return is_updating
+
+    def is_update_rules_async(self):
+        """
+        Check if Asynchronous rule update is currently happening.
+        @returns: True if rule update is happening, otherwise False.
+        @rtype: C{boolean}
+        """
+        return self.updater and self.updater.is_alive()
 
     def abort_update_rules_async(self):
         """
@@ -706,6 +715,7 @@ class G2P:
         ctype_rules = (c_char_p * len(self.rules))()
         ctype_rules[:] = self.rules
         self.g2plib.set_rules(ctype_rules, len(ctype_rules))
+        self.updater = None
 
 class G2PTestCase(unittest.TestCase):
     """
@@ -831,7 +841,9 @@ class G2PTestCase(unittest.TestCase):
         setswana_dict = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
         g2p = G2P()
         g2p.set_dictionary(copy.deepcopy(setswana_dict))
+        self.assertFalse(g2p.is_update_rules_async())
         g2p.update_rules_async(setswana_dict)
+        self.assertTrue(g2p.is_update_rules_async())
         log.info('Pausing %d second before aborting rule rebuilding' %abort_delay)
         sleep(abort_delay)
         log.info('Aborting rule rebuilding')
@@ -839,6 +851,7 @@ class G2PTestCase(unittest.TestCase):
         while g2p.poll_update_rules_async():
             log.info("Waiting while rules are updated...")
             sleep(1)
+        self.assertFalse(g2p.is_update_rules_async())
 
     def test_update_rules_async(self):
         """
