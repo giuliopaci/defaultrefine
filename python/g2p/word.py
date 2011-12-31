@@ -43,8 +43,6 @@
 from charset import u2a
 import unittest
 
-from application import Application
-
 class WordCategories:
     """
     Singleton word categories class
@@ -58,8 +56,6 @@ class WordCategories:
             """
             Initialise the WordCagegories
             """
-            self.__log = Application().get_log()
-            self.__log.debug("WordCategories.__init__()")
             self.__current_categories = None
             self._setup_default_categories()
 
@@ -84,7 +80,6 @@ class WordCategories:
             @param category_name: The name of the category to add
             @type category_name: C{str}
             """ 
-            self.__log.debug("WordCategories.add_category()")
             if category_name not in self.__current_categories:
                 self.__current_categories.append(category_name)
 
@@ -106,7 +101,6 @@ class WordCategories:
             @param category_name: The name of the category to remove
             @type category_name: C{str}
             """
-            self.__log.debug("WordCategories.remove_category()")
             if category_name in self.__current_categories:
                 self.__current_categories.remove(category_name)
 

@@ -1,2 +1,2 @@
-from g2p import G2P
+from g2p import *
 from dictionaryfile import DictionaryFile
