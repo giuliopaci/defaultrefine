@@ -142,6 +142,14 @@ class G2P:
         """
         G2P constructor.
         """
+        global g2p_log
+        if g2p_log == None:
+            if os.name == 'nt':
+                # Windows sends stdout to stderr causing error dialog on close, so we disable
+                # console output.
+                g2p_log = Log(LOG_TITLE, LOG_PATH, console=False).get_log()
+            else:
+                g2p_log = Log(LOG_TITLE, LOG_PATH).get_log()
         self.log = g2p_log
         self.log.debug("G2P.__init__()")
         self.dict = None                  # All words being considered
