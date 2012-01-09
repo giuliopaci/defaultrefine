@@ -65,7 +65,6 @@ global g2p_log
 g2p_log = None
 
 def set_g2p_log(log):
-    global g2p_log
     g2p_log = log
 
 def init_count_map(graphemes, phonemes):
@@ -112,7 +111,6 @@ class G2PUpdater(Process):
         @param pipe: Communication pipe.
         @type pipe: C{Pipe}
         """
-        global g2p_log
         Process.__init__(self)
         log = g2p_log
         log.info("G2PUpdater.__init__()")
@@ -123,7 +121,6 @@ class G2PUpdater(Process):
         """
         Run G2P update process
         """
-        global g2p_log
         log = g2p_log
         log.info("G2PUpdater.run()")
         g2p = G2P()
@@ -145,7 +142,6 @@ class G2P:
         """
         G2P constructor.
         """
-        global g2p_log
         self.log = g2p_log
         self.log.debug("G2P.__init__()")
         self.dict = None                  # All words being considered
@@ -721,7 +717,6 @@ class G2P:
         Called when object is un-pickled (loaded from file).
         """
         # Called when project is loaded from file.
-        global g2p_log
         self.__dict__.update(dict)   # update attributes
         self.log = g2p_log
         self.log.debug("G2P.__setstate__()")
@@ -752,7 +747,6 @@ class G2PTestCase(unittest.TestCase):
                                 Otherwise, skip Unittest assert and continue running.
         @type unittest_assert: C{bool}
         """
-        global g2p_log
         log = g2p_log
         failed_count = 0
         for t_word in test_words:
@@ -779,7 +773,6 @@ class G2PTestCase(unittest.TestCase):
         """
         Test word set/get.
         """
-        global g2p_log
         log = g2p_log
         log.info("G2PTestCase.test_set_dictionary()")
         words = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
@@ -796,7 +789,6 @@ class G2PTestCase(unittest.TestCase):
         """
         Test g2p data reading and writing.
         """
-        global g2p_log
         log = g2p_log
         log.info("G2PTestCase.test_pickling()")
         SAVE_FILE = "../test_data/tsn.g2p"
@@ -819,7 +811,6 @@ class G2PTestCase(unittest.TestCase):
         """
         Test with Setswana data set.
         """
-        global g2p_log
         log = g2p_log
         log.info("G2PTestCase.test_setswana()")
         all_dict = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
@@ -853,7 +844,6 @@ class G2PTestCase(unittest.TestCase):
         """
         Test cancelling rule update.
         """
-        global g2p_log
         log = g2p_log
         abort_delay = 5
         log.info("G2PTestCase.test_abort()")
@@ -881,7 +871,6 @@ class G2PTestCase(unittest.TestCase):
             4. While update is being processed, test first word list pronunciation predictions
             5. When update is complete, test second word list pronunciation prediction.
         """
-        global g2p_log
         log = g2p_log
         log.info("G2PTestCase.test_update_rules_async()")
         g2p = G2P()
@@ -917,7 +906,6 @@ class G2PTestCase(unittest.TestCase):
         self.assertTrue(correct_count > 1)
 
 if __name__ == "__main__":
-    global g2p_log
     if os.name == 'nt':
         # Windows sends stdout to stderr causing error dialog on close, so we disable
         # console output.
