@@ -41,114 +41,69 @@
 #-----------------------------------------------------------------------------#
 
 import unittest
-import re
 
-class Pattern:
+def create_char_maps(strings):
     """
-    Describes a word pattern in the context of a specific grapheme.  Word patterns
-    are substrings of words, representing probable sequences of graphemes.
+    Create mappings from the given strings to single ascii characters.  Two
+    mappings are returned for optimal access performance:
+        1) strings -> chars
+        2) chars -> strings.
+    
+    @param strings: List of strings
+    @type strings: C{list} of C{str}
     """
-    def __init__(self, pid, phoneme, context):
-        """
-        Constructor
-        """
-        self.id = pid
-        self.phoneme = phoneme
-        self.context = context
-
-    def __str__(self):
-        """
-        Overriding "to string" method.
-        @Returns: String representation
-        @rtype: C{str}
-        """
-        return "Pattern(%d, \"%s\", \"%s\")" % (self.id, self.phoneme, self.context)
-
-    def __cmp__(self, other):
-        """
-        Overriding comparison operator.
-        @Returns: comparison result (1, 0, -1)
-        @rtype: C{int}
-        """
-        if self.id != other.id:
-            return -1
-        if self.phoneme != other.phoneme:
-            return -1
-        if self.context != other.context:
-            return -1
-        return 0
-
-    def get_id(self):
-        """
-        Return id.
-        @returns: id
-        @rtype: C{int}
-        """
-        return self.id
-
-    def get_phoneme(self):
-        """
-        Returns pattern phoneme.
-        @returns: phoneme
-        @rtype: C{str}
-        """
-        return self.phoneme
-
-    def get_context(self):
-        """
-        Returns pattern context.
-        @returns: context
-        @rtype: C{str}
-        """
-        return self.context
-
-    def get_grapheme(self):
-        """
-        Return the grapheme that is central to the context.
-        @returns: context
-        @rtype: C{str}
-        """
-        m = re.compile('.*-(.*)-.*').match(self.context)
-        if m:
-            return m.group(1)
+    char_to_str = {}
+    str_to_char = {}
+    char_availability = {}
+    for i in range(ord('a'), ord('z') + 1):
+        char_availability[chr(i)] = True
+    for i in range(ord('A'), ord('Z') + 1):
+        char_availability[chr(i)] = True
+    for i in range(ord('1'), ord('9')):
+        char_availability[chr(i)] = True
+    misses = []
+    for s in strings:
+        if s in char_availability:
+            str_to_char[s] = s
+            char_to_str[s] = s
+            char_availability[s] = False
         else:
-            raise Exception, 'context parsing failure for context "%s"' %self.context
+            misses.append(s)
+    for s in misses:
+        c = None
+        for k,v in char_availability.iteritems():
+            if v:
+                c = k
+        if c is None:
+            raise RuntimeError, "Character map limit exceeded."
+        str_to_char[s] = c
+        char_to_str[c] = s
+        char_availability[c] = False
+    return (char_to_str, str_to_char)
 
-
-class G2PPatternTestCase(unittest.TestCase):
-    """
-    Test G2P utility methods.
-    """
-    def test_cmp(self):
-        """
-        Test comparison operator.
-        """
-        p1 = Pattern(0, "P", "a-b-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertEqual(p1, p2)
-
-        p1 = Pattern(1, "P", "a-b-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertNotEqual(p1, p2)
-
-        p1 = Pattern(0, "A", "a-b-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertNotEqual(p1, p2)
-
-        p1 = Pattern(0, "P", "a-c-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertNotEqual(p1, p2)
-
-    def test_accessors(self):
-        """
-        Test accessor methods.
-        """
-        p = Pattern(1, "A", "a-b-c")
-        self.assertEquals( p.get_id(), 1)
-        self.assertEquals( p.get_phoneme(), "A")
-        self.assertEquals( p.get_context(), "a-b-c")
-        self.assertEquals( p.get_grapheme(), "b")
-
+class CharacterMapTestCase(unittest.TestCase):
+    def test(self):
+        strings = ['a', 'z', 'z_h', 'b' ]
+        (char_to_str, str_to_char) = create_char_maps(strings)
+        for s in strings:
+            mapped = str_to_char[s]
+            unmapped = char_to_str[str_to_char[s]]
+            print s, " -> ", mapped, " -> ", unmapped
+            self.assertEquals(s, unmapped)
+        
 
 if __name__ == "__main__":
     unittest.main()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

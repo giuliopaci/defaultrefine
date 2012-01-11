@@ -56,6 +56,7 @@ from log import Log
 from dictionaryfile import DictionaryFile
 from wordfile import WordFile
 from charset import u2a
+import charmap
 from g2p_pattern import Pattern
 from word import Word
 
@@ -97,7 +98,7 @@ def update_count_map(dict, count_map):
         phones = w.get_phonemes()
         if len(graphs) == len(phones):
             for i in range(len(graphs)):
-                count_map[graphs[i]][phones[i]] += 1
+                count_map[ graphs[i] ][ phones[i] ] += 1
 
 class G2PUpdater(Process):
     """
@@ -128,7 +129,7 @@ class G2PUpdater(Process):
         log.info("G2PUpdater updating rules...")
         g2p.update_rules()
         log.info("G2PUpdater updating rules complete")
-        self.pipe.send((g2p.character_map, g2p.rules))
+        self.pipe.send((g2p.rules))
         log.info("G2PUpdater exiting run block")
 
 class G2P:
@@ -155,7 +156,6 @@ class G2P:
         self.dict = None                  # All words being considered
         self.graphemes = None             # Grapheme list
         self.phonemes = None              # Phoneme list
-        self.character_map = None         # Maps phonemes to single characters for convenience
         self.aligned_graphemes = None
         self.aligned_phonemes = None
         self.gnulled_dict = None
@@ -176,12 +176,12 @@ class G2P:
             self.g2plib = cdll.LoadLibrary("WinG2PDLL.dll")
         else:
             raise OSError
-        self.g2plib.set_grapheme.argtypes = [ c_char ]
+        self.g2plib.set_grapheme.argtypes = [ c_char_p ]
         self.g2plib.add_pattern.argtypes = [ c_int, c_char_p, c_wchar_p ]
         self.g2plib.generate_rules.restype = POINTER(c_char_p)
         self.g2plib.set_rules.argtypes = [ POINTER(c_char_p), c_int ]
         self.g2plib.predict_pronunciation.argtypes = [ c_wchar_p ]
-        self.g2plib.predict_pronunciation.restype = c_wchar_p
+        self.g2plib.predict_pronunciation.restype = c_char_p
 
     def set_dictionary(self, dict):
         """
@@ -190,9 +190,8 @@ class G2P:
         @type dict: C{list} of C{Word}
         """
         self.dict = copy.deepcopy(dict)
-        self.generate_graphemes()
         self.generate_phonemes()
-        self.generate_character_map()
+        self.generate_graphemes()
         self.align_words()
         self.extract_patterns()
         
@@ -235,7 +234,7 @@ class G2P:
         if not self.updater.is_alive():
             return False
         while self.pipe.poll():
-            (self.character_map, self.rules) = self.pipe.recv()
+            (self.rules) = self.pipe.recv()
             ctype_rules = (c_char_p * len(self.rules))()
             ctype_rules[:] = self.rules
             self.g2plib.set_rules(ctype_rules, len(ctype_rules))
@@ -256,7 +255,7 @@ class G2P:
         """
         self.updater.terminate()
 
-    def predict_pronunciation(self, word_str):
+    def predict_pronunciation(self, word_str, silent=False):
         """
         Predict pronunciation of a word.
         @param word_str: List of predicted phonemes
@@ -265,57 +264,55 @@ class G2P:
         if len(self.rules) == 0:
             self.log.warn('G2P.predict_pronunciation(): G2P rules not yet built')
             return []
-        self.log.debug('G2P.predict_pronunciation("%s")' %word_str)
-        mapped_phonemes = self.g2plib.predict_pronunciation(word_str)
-        if mapped_phonemes == None:
+        if not silent:
+            self.log.debug('G2P.predict_pronunciation("%s")' %word_str)
+        mapped_str = ''
+        for c in u2a(word_str):
+            mapped_str = mapped_str + self.gmap_s2c[c]
+        pred = self.g2plib.predict_pronunciation(mapped_str)
+        if pred == None:
             return []
-        phonemes = []
-        for c in mapped_phonemes:
-            for k,v in self.character_map.items():
-                if c == v:
-                    phonemes.append(k)
-        return phonemes
+        mapped_pred = []
+        for p in pred:
+            mapped_pred.append(self.pmap_c2s[p])
+        return mapped_pred
 
     def generate_graphemes(self):
         """
-        Step 2. Generate grapheme list from word list.        
+        Step 2. Generate grapheme list from word list.  Map graphemes to single characters to
+                simplify encoding issues.
         """
         self.log.debug("G2P.generate_graphemes()")
-        # Add null grapheme possibility
-        self.graphemes = [ u'0' ]
+        graphs = []
         for w in self.dict:
-            self.graphemes.extend(w.graphemes)
-        self.graphemes = list(set(self.graphemes))
+            for g in w.graphemes:
+                if g not in graphs:
+                    graphs.append(g)
+        (self.gmap_c2s, self.gmap_s2c) = charmap.create_char_maps(graphs)
+        for w in self.dict:
+            for i in range(len(w.graphemes)):
+                w.graphemes[i] = self.gmap_s2c[w.graphemes[i]]
+        # Add null grapheme possibility
+        self.graphemes = [ ]
+        self.graphemes.extend( self.gmap_c2s.keys())
         
     def generate_phonemes(self):
         """
-        Step 3. Generate phoneme list from word list.  
+        Step 3. Generate phoneme list from word list.  Map phonemes to single characters to
+                simplify encoding issues.
         """
         self.log.debug("G2P.generate_phonemes()")
-        self.phonemes = []
+        phones = []
         for w in self.dict:
-            for p in w.get_phonemes():
-                self.phonemes.append(p)
-        self.phonemes = list(set(self.phonemes))
+            for p in w.phonemes:
+                if p not in phones:
+                    phones.append(p)
+        (self.pmap_c2s, self.pmap_s2c) = charmap.create_char_maps(phones)
+        for w in self.dict:
+            for i in range(len(w.phonemes)):
+                w.phonemes[i] = self.pmap_s2c[w.phonemes[i]]
+        self.phonemes = self.pmap_c2s.keys()
         
-    def generate_character_map(self):
-        """
-        Step 4. Generate mapping of phonemes to single characters.
-        
-        Note, this is Required by libG2P as an optimization.        
-        """
-        self.log.debug("G2P.generate_character_map()")
-        self.character_map = {}        
-        char_value = ord('A')
-        for p in self.phonemes:
-            if not p in self.character_map:
-                self.character_map[p] = chr(char_value)
-                char_value += 1
-                if char_value == ord('Z') + 1:
-                    char_value = ord('a')
-                if char_value > ord('z'):
-                    raise RuntimeError, "Character map limit exceeded."
-
     def generate_probability_maps(self, align_counts, gnull_counts):
         """
         Calculate probabilities based on count maps.
@@ -687,22 +684,18 @@ class G2P:
         """
         self.log.debug("G2P.generate_rules()")
         self.rules = []
-        for g in self.graphemes:            
-            self.g2plib.set_grapheme(u2a(g))
+        for g in self.graphemes:
+            self.g2plib.set_grapheme(g)
             for p in self.patterns:
                 if p.get_grapheme() == g:
-                    if p.get_phoneme() != u'0':
-                        mapped_phone = self.character_map[p.get_phoneme()]
-                    else:
-                        mapped_phone = u'0'                    
-                    self.g2plib.add_pattern(p.get_id(), mapped_phone, u2a(p.get_context()))
+                    self.g2plib.add_pattern(p.get_id(), p.phoneme, p.get_context())
             new_rules = self.g2plib.generate_rules()
             for rule in new_rules:
                 if rule == None:
                     break
                 self.rules.append(rule)
             self.g2plib.clear_patterns()
-                
+    
     def __getstate__(self):
         """
         Called when object is pickled (saved to file).
@@ -733,7 +726,35 @@ class G2P:
         ctype_rules[:] = self.rules
         self.g2plib.set_rules(ctype_rules, len(ctype_rules))
         self.updater = None
-
+        
+    def dump_data(self, label='dump'):
+        """
+        Dump G2P data to files for inspection.
+        @param label: Basename for dump files.
+        @type label: C{str}
+        """
+        f = open('%s.gra' %label, 'w')
+        for g in self.graphemes:
+            for k,v in self.gmap_s2c.iteritems():
+                f.write('%s -> %s\n' %(v, k.encode('utf-8')))
+        f.close()
+        f = open('%s.pho' %label, 'w')
+        for k,v in self.pmap_s2c.iteritems():
+            f.write('%s -> %s\n' %(k, v))
+        f.close()
+        f = open('%s.rul' %label, 'w')
+        for r in self.rules:
+            f.write('%s\n' %r)
+        f.close()
+        f = open('%s.dic' %label, 'w')
+        for w in self.dict:
+            f.write('%s %s\n' %(w.get_text(), ''.join(w.phonemes)))
+        f.close()
+        f = open('%s.pat' %label, 'w')
+        for p in self.patterns:
+            f.write('%s;%s\n' %(p.phoneme, p.context.strip()))
+        f.close()
+        
 class G2PTestCase(unittest.TestCase):
     """
     Test case for the G2P object.
@@ -763,7 +784,7 @@ class G2PTestCase(unittest.TestCase):
                     result_str = "OKAY"
                     graphs = d_word.get_graphemes()
                     phones = d_word.get_phonemes()
-                    pred_phones = g2p.predict_pronunciation(t_word)
+                    pred_phones = g2p.predict_pronunciation(t_word, silent=True)
                     if phones != pred_phones:
                         failed_count += 1
                         log.error('Prediction failed for "%s" : "%s" != "%s"' \
@@ -776,22 +797,6 @@ class G2PTestCase(unittest.TestCase):
         if unittest_assert:
             self.assertEquals(correct_count, word_count)
         return correct_count
-
-    def test_set_dictionary(self):
-        """
-        Test word set/get.
-        """
-        log = g2p_log
-        log.info("G2PTestCase.test_set_dictionary()")
-        words = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
-        g2p = G2P()
-        g2p.set_dictionary(words)
-        words2 = g2p.get_dictionary()[:]
-        self.assertEquals(len(words), len(words2), \
-                          'set_dictionary()/get_dictionary() length failure.')
-        for w in words:
-           if w not in words2:
-               self.fail('set_dictionary()/get_dictionary indexing failure.')
 
     def test_pickling(self):
         """
@@ -809,11 +814,9 @@ class G2PTestCase(unittest.TestCase):
         test_words = []
         for w in dict_words[:20]:
             test_words.append(w.get_text())
-        test_count = len(test_words)
         correct_count = \
             self.run_regression(g2p_from_file, dict_words, test_words, unittest_assert=False)
-        # TODO: "correct_count" below should equal "test_count"
-        self.assertTrue(correct_count >= 1)
+        self.assertTrue(correct_count, len(test_words))
 
     def test_setswana(self):
         """
@@ -847,7 +850,7 @@ class G2PTestCase(unittest.TestCase):
                  %(test_count, correct, (float(correct) / float(test_count)) * 100))
         # TODO: "correct_count" should equal the "test_count"
         self.assertTrue(correct > 1)
-
+        
     def test_abort(self):
         """
         Test cancelling rule update.
@@ -891,7 +894,6 @@ class G2PTestCase(unittest.TestCase):
         g2p.set_dictionary(copy.deepcopy(dict_words))
         g2p.update_rules()
         correct_count = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
-        # TODO: "correct_count" below should be 100%
         self.assertTrue(correct_count > 1)
         log.info('Adding words words and conducting "in-place" asynchronous update_rules test')
         dict_words_async = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
@@ -902,16 +904,12 @@ class G2PTestCase(unittest.TestCase):
         g2p.update_rules_async(dict_words_async)
         while g2p.poll_update_rules_async():
             log.info("Waiting while rules are updated...")
-            # Verify G2P still callable and correct.
             correct_count = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
-            # TODO: "correct_count" below should be 100%
-            self.assertTrue(correct_count > 1)
+            self.assertEquals(correct_count, 20)
             sleep(1)
-        # Testing with new rules
         correct_count = self.run_regression(g2p, dict_words_async, async_test_words, 
                                             unittest_assert=False)
-        # TODO: "correct_count" below should equal "test_count"
-        self.assertTrue(correct_count > 1)
+        self.assertEquals(correct_count, 20)
 
 if __name__ == "__main__":
     if os.name == 'nt':
@@ -921,10 +919,9 @@ if __name__ == "__main__":
     else:
         g2p_log = Log(LOG_TITLE, LOG_PATH).get_log()
     suite = unittest.TestSuite()
-    suite.addTest(G2PTestCase('test_set_dictionary'))
     suite.addTest(G2PTestCase('test_pickling'))
-    suite.addTest(G2PTestCase('test_update_rules_async'))
     suite.addTest(G2PTestCase('test_setswana'))
+    suite.addTest(G2PTestCase('test_update_rules_async'))
     suite.addTest(G2PTestCase('test_abort'))
     result = unittest.TextTestRunner().run(suite)
     if not result.wasSuccessful():
