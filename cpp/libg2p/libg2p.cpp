@@ -78,15 +78,15 @@ RTree g_rtree;
 // DLL entry function (called on load, unload, ...)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 {
-	return TRUE;
+    return TRUE;
 }
 #endif
 
 // Set the grapheme for prediction rule generation.
-extern "C" __declspec(dllexport) void set_grapheme(char g)
+extern "C" __declspec(dllexport) void set_grapheme(char *g)
 {
-    DEBUG_("Setting grapheme to '%c'", g);
-	g_grapheme = g;
+    //DEBUG_("set_grapheme(%s)", g);
+    g_grapheme = *g;
 }
 
 // Add pattern to list of patterns for prediction rule generation.
@@ -94,69 +94,64 @@ extern "C" __declspec(dllexport) void add_pattern(int id, char *phoneme, wchar_t
 {
     //DEBUG_("Adding pattern id=%d, phoneme='%s', context='%S'", id, 
     //       phoneme, context);
-	string phoneme_str = string(phoneme);
-	wstring context_str = wstring(context);
-	g_patterns.push_back(Pattern(id, phoneme_str, context_str));
+    string phoneme_str = string(phoneme);
+    wstring context_str = wstring(context);
+    g_patterns.push_back(Pattern(id, phoneme_str, context_str));
 }
 
 // Returns list of rules for given grapheme and patterns.
 extern "C" __declspec(dllexport) char** generate_rules(void)
 {
-    DEBUG_("Generating rules");
-	bool use_groups = 0;
-	int min_kids = 1;
-	int max_groups = 0;
-	char *groups_file = "";  
-	map<int, map<string, map <string,int> > > gpatts;
-	list<string> patlist;
-	int best=0;
-	
-	vector<Pattern>::iterator it;
-	for ( it=g_patterns.begin(); it < g_patterns.end(); it++ ) {
-		patlist.clear();        
-        // TODO: Add wide character support to get_all_pats_limit.
+    DEBUG_("generate_rules() : %c", g_grapheme);
+    bool use_groups = 0;
+    int min_kids = 1;
+    int max_groups = 0;
+    char *groups_file = "";  
+    map<int, map<string, map <string,int> > > gpatts;
+    list<string> patlist;
+    int best=0;
+    
+    vector<Pattern>::iterator it;
+    for ( it=g_patterns.begin(); it < g_patterns.end(); it++ ) {
+        patlist.clear();        
         wstring w_context = it->get_context();
         string ascii_context(w_context.begin(), w_context.end());
-        //DEBUG_("Calling get_all_pats_limit('%s')", ascii_context.c_str());
-		get_all_pats_limit((const string*)&ascii_context,1,1000,patlist);
-		list<string>::iterator i;
-		for (i=patlist.begin();i!=patlist.end();i++) {
-            //DEBUG_("Adding pattern: '%s'", i->c_str());
-			int len = (int)i->length()-2;
-			gpatts[len][*i][it->get_phoneme()]++;
-			if (gpatts[len][*i][it->get_phoneme()]>best) {
-				best=gpatts[len][*i][it->get_phoneme()];
-			}
-		}
-	}
+        get_all_pats_limit((const string*)&ascii_context,1,1000,patlist);
+        list<string>::iterator i;
+        for (i=patlist.begin();i!=patlist.end();i++) {
+            int len = (int)i->length()-2;
+            gpatts[len][*i][it->get_phoneme()]++;
+            if (gpatts[len][*i][it->get_phoneme()]>best) {
+                    best=gpatts[len][*i][it->get_phoneme()];
+            }
+        }
+    }
 
-	GRule* grules = new GRule(use_groups, min_kids, max_groups, groups_file);  
-    //DEBUG_("Calling rules_frompats_opt('%c')", g_grapheme);
-	rules_frompats_opt(&g_grapheme, gpatts, best, grules);
-	vector<string> rules_v = grules->get_rules();
-	vector<string>::iterator rules_iter;
-	char **rules = (char **)malloc(sizeof(char*) * (rules_v.size() + 1));
-	int count = 0;
-	for (rules_iter=rules_v.begin(); rules_iter < rules_v.end(); rules_iter++) {
-		int rule_len = rules_iter->length();
-		rules[count] = (char *)malloc(sizeof(char) * (rule_len + 1));
-		strncpy(rules[count], rules_iter->c_str(), rule_len + 1);
-		count ++;
-	}
-	rules[count] = NULL;
-	return rules;
+    GRule* grules = new GRule(use_groups, min_kids, max_groups, groups_file);  
+    rules_frompats_opt(&g_grapheme, gpatts, best, grules);
+    vector<string> rules_v = grules->get_rules();
+    vector<string>::iterator rules_iter;
+    char **rules = (char **)malloc(sizeof(char*) * (rules_v.size() + 1));
+    int count = 0;
+    for (rules_iter=rules_v.begin(); rules_iter < rules_v.end(); rules_iter++) {
+        int rule_len = rules_iter->length();
+        rules[count] = (char *)malloc(sizeof(char) * (rule_len + 1));
+        strncpy(rules[count], rules_iter->c_str(), rule_len + 1);
+        count ++;
+    }
+    rules[count] = NULL;
+    return rules;
 }
 
 extern "C" __declspec(dllexport) void clear_patterns(void)
 {
-    DEBUG_("Clearing patterns");
-	g_patterns.clear();
+    //DEBUG_("Clearing patterns");
+    g_patterns.clear();
 }
 
 extern "C" __declspec(dllexport) void set_rules(char **rules, int count)
 {
     DEBUG_("Setting rules");
-
     for (int i=0; i<count; i++) {
         //DEBUG_("Adding rule:'%s'", rules[i]);
         vector<string> parts;
@@ -176,13 +171,13 @@ extern "C" __declspec(dllexport) void set_rules(char **rules, int count)
     }
 }
 
-extern "C" __declspec(dllexport) wchar_t* predict_pronunciation(wchar_t *wc_wordp)
+extern "C" __declspec(dllexport) char* predict_pronunciation(wchar_t *wc_wordp)
 {
     int errno;
     string result_str = "";
     vector <string> result;
     vector <RNode*> rules;
-    wchar_t *resultp;
+    char *resultp;
 
     wstring w_word(wc_wordp);
     string word_str(w_word.begin(), w_word.end());
@@ -199,7 +194,7 @@ extern "C" __declspec(dllexport) wchar_t* predict_pronunciation(wchar_t *wc_word
         }
     }
     size_t len = result_str.length();
-    resultp = (wchar_t*)malloc(sizeof(wchar_t) * (len + 1));
-    mbstowcs( resultp, result_str.c_str(), result_str.size() + 1 );
+    resultp = (char*)malloc(sizeof(char) * (len + 1));
+    strncpy(resultp, result_str.c_str(), len + 1);
     return resultp;
 }
