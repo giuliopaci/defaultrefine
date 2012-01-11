@@ -687,8 +687,8 @@ class G2P:
         for g in self.graphemes:
             self.g2plib.set_grapheme(g)
             for p in self.patterns:
-                if p.get_grapheme() == g:
-                    self.g2plib.add_pattern(p.get_id(), p.phoneme, p.get_context())
+                if p.grapheme == g:
+                    self.g2plib.add_pattern(p.id, p.phoneme, p.context)
             new_rules = self.g2plib.generate_rules()
             for rule in new_rules:
                 if rule == None:
@@ -815,7 +815,7 @@ class G2PTestCase(unittest.TestCase):
         for w in dict_words[:20]:
             test_words.append(w.get_text())
         correct_count = \
-            self.run_regression(g2p_from_file, dict_words, test_words, unittest_assert=False)
+            self.run_regression(g2p_from_file, dict_words, test_words)
         self.assertTrue(correct_count, len(test_words))
 
     def test_setswana(self):
@@ -893,7 +893,7 @@ class G2PTestCase(unittest.TestCase):
         test_count = len(test_words)
         g2p.set_dictionary(copy.deepcopy(dict_words))
         g2p.update_rules()
-        correct_count = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
+        correct_count = self.run_regression(g2p, dict_words, test_words)
         self.assertTrue(correct_count > 1)
         log.info('Adding words words and conducting "in-place" asynchronous update_rules test')
         dict_words_async = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
@@ -904,11 +904,10 @@ class G2PTestCase(unittest.TestCase):
         g2p.update_rules_async(dict_words_async)
         while g2p.poll_update_rules_async():
             log.info("Waiting while rules are updated...")
-            correct_count = self.run_regression(g2p, dict_words, test_words, unittest_assert=False)
+            correct_count = self.run_regression(g2p, dict_words, test_words)
             self.assertEquals(correct_count, 20)
             sleep(1)
-        correct_count = self.run_regression(g2p, dict_words_async, async_test_words, 
-                                            unittest_assert=False)
+        correct_count = self.run_regression(g2p, dict_words_async, async_test_words)
         self.assertEquals(correct_count, 20)
 
 if __name__ == "__main__":

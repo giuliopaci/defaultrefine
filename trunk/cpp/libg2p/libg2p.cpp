@@ -72,7 +72,7 @@ using namespace std;
 
 char g_grapheme;
 vector<Pattern> g_patterns;
-RTree g_rtree;
+RTree *g_rtree = NULL;
 
 #ifdef _WIN32
 // DLL entry function (called on load, unload, ...)
@@ -152,6 +152,11 @@ extern "C" __declspec(dllexport) void clear_patterns(void)
 extern "C" __declspec(dllexport) void set_rules(char **rules, int count)
 {
     DEBUG_("Setting rules");
+    // Reset rules
+    if (g_rtree != NULL) {
+        delete g_rtree;
+    }
+    g_rtree = new RTree();
     for (int i=0; i<count; i++) {
         //DEBUG_("Adding rule:'%s'", rules[i]);
         vector<string> parts;
@@ -163,10 +168,10 @@ extern "C" __declspec(dllexport) void set_rules(char **rules, int count)
         }
         int num = atoi(parts[4].c_str());
         if ((parts[1].compare("")==0)&&(parts[2].compare("")==0)) {
-            g_rtree.init_root(parts[0],parts[3],num);
+            g_rtree->init_root(parts[0],parts[3],num);
         } else {
             string newname = parts[1] + "-" + parts[0] + "-" + parts[2];
-            g_rtree.add_rule(parts[0],newname,parts[3],num);
+            g_rtree->add_rule(parts[0],newname,parts[3],num);
         }
     }
 }
@@ -183,7 +188,7 @@ extern "C" __declspec(dllexport) char* predict_pronunciation(wchar_t *wc_wordp)
     string word_str(w_word.begin(), w_word.end());
 
     word_str = " " + word_str + " ";
-    errno = g_rtree.predict_word(word_str, result, rules);
+    errno = g_rtree->predict_word(word_str, result, rules);
     if (errno != 0) {
         return NULL;
     }

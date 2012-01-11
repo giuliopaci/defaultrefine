@@ -40,7 +40,6 @@
 #                                                                             #
 #-----------------------------------------------------------------------------#
 
-import unittest
 import re
 
 class Pattern:
@@ -55,100 +54,8 @@ class Pattern:
         self.id = pid
         self.phoneme = phoneme
         self.context = context
-
-    def __str__(self):
-        """
-        Overriding "to string" method.
-        @Returns: String representation
-        @rtype: C{str}
-        """
-        return "Pattern(%d, \"%s\", \"%s\")" % (self.id, self.phoneme, self.context)
-
-    def __cmp__(self, other):
-        """
-        Overriding comparison operator.
-        @Returns: comparison result (1, 0, -1)
-        @rtype: C{int}
-        """
-        if self.id != other.id:
-            return -1
-        if self.phoneme != other.phoneme:
-            return -1
-        if self.context != other.context:
-            return -1
-        return 0
-
-    def get_id(self):
-        """
-        Return id.
-        @returns: id
-        @rtype: C{int}
-        """
-        return self.id
-
-    def get_phoneme(self):
-        """
-        Returns pattern phoneme.
-        @returns: phoneme
-        @rtype: C{str}
-        """
-        return self.phoneme
-
-    def get_context(self):
-        """
-        Returns pattern context.
-        @returns: context
-        @rtype: C{str}
-        """
-        return self.context
-
-    def get_grapheme(self):
-        """
-        Return the grapheme that is central to the context.
-        @returns: context
-        @rtype: C{str}
-        """
         m = re.compile('.*-(.*)-.*').match(self.context)
         if m:
-            return m.group(1)
+            self.grapheme = m.group(1)
         else:
             raise Exception, 'context parsing failure for context "%s"' %self.context
-
-
-class G2PPatternTestCase(unittest.TestCase):
-    """
-    Test G2P utility methods.
-    """
-    def test_cmp(self):
-        """
-        Test comparison operator.
-        """
-        p1 = Pattern(0, "P", "a-b-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertEqual(p1, p2)
-
-        p1 = Pattern(1, "P", "a-b-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertNotEqual(p1, p2)
-
-        p1 = Pattern(0, "A", "a-b-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertNotEqual(p1, p2)
-
-        p1 = Pattern(0, "P", "a-c-c")
-        p2 = Pattern(0, "P", "a-b-c")
-        self.assertNotEqual(p1, p2)
-
-    def test_accessors(self):
-        """
-        Test accessor methods.
-        """
-        p = Pattern(1, "A", "a-b-c")
-        self.assertEquals( p.get_id(), 1)
-        self.assertEquals( p.get_phoneme(), "A")
-        self.assertEquals( p.get_context(), "a-b-c")
-        self.assertEquals( p.get_grapheme(), "b")
-
-
-if __name__ == "__main__":
-    unittest.main()
