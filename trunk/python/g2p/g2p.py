@@ -126,6 +126,7 @@ class G2PUpdater(Process):
         log.info("G2PUpdater.run()")
         g2p = G2P()
         g2p.set_dictionary(self.dict)
+        g2p.align()
         log.info("G2PUpdater updating rules...")
         g2p.update_rules()
         log.info("G2PUpdater updating rules complete")
@@ -192,17 +193,14 @@ class G2P:
         self.dict = copy.deepcopy(dict)
         self.generate_phonemes()
         self.generate_graphemes()
+        
+    def align(self):
+        """
+        Perform alignment and pattern extraction.
+        """
         self.align_words()
         self.extract_patterns()
         
-    def get_dictionary(self):
-        """
-        Return active dictionary.
-        @returns: list of words
-        @rtype: C{list} of C{Word}
-        """
-        return self.dict
-
     def update_rules(self):
         """
         Update rules with current word list
@@ -219,6 +217,7 @@ class G2P:
         Keep old prediction rules active during new rule processing.
         """
         self.log.debug("G2P.update_rules_async()")
+        self.set_dictionary(dict)
         self.pipe, pipe = Pipe()
         self.updater = G2PUpdater(dict, pipe)
         self.updater.start()
@@ -617,12 +616,7 @@ class G2P:
         self.log.debug("Generating graphemic dictionary")
         self.generate_gnulled_dict()
         self.log.debug("Graphemic dictionary complete")
-        #TODO: Disabled graphemic null substitution because it hurts the prediction results.
-        #      Have kept the graphemic null generation above so that it continues to be tested
-        #      and validated during development.
-        #self.aligned_dict = copy.deepcopy(self.gnulled_dict)
-        
-        self.aligned_dict = copy.deepcopy(self.dict)
+        self.aligned_dict = copy.deepcopy(self.gnulled_dict)
 
         # Count the number of times X aligns to Y.
         align_counts = init_count_map(self.graphemes, self.phonemes)
@@ -808,6 +802,7 @@ class G2PTestCase(unittest.TestCase):
         g2p_to_file = G2P()
         dict_words = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
         g2p_to_file.set_dictionary(copy.deepcopy(dict_words))
+        g2p_to_file.align()
         g2p_to_file.update_rules()
         pickle.dump(g2p_to_file, open(SAVE_FILE, 'wb'))
         g2p_from_file = pickle.load( open(SAVE_FILE) )
@@ -829,6 +824,7 @@ class G2PTestCase(unittest.TestCase):
         test_dict = DictionaryFile().from_file(self.TSN_TEST_DICT_PATH)
         g2p = G2P()
         g2p.set_dictionary(copy.deepcopy(train_dict))
+        g2p.align()
         g2p.update_rules()
         # Predict train set words
         test_words = []
@@ -861,6 +857,7 @@ class G2PTestCase(unittest.TestCase):
         setswana_dict = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
         g2p = G2P()
         g2p.set_dictionary(copy.deepcopy(setswana_dict))
+        g2p.align()
         self.assertFalse(g2p.is_update_rules_async())
         g2p.update_rules_async(setswana_dict)
         self.assertTrue(g2p.is_update_rules_async())
@@ -892,6 +889,7 @@ class G2PTestCase(unittest.TestCase):
             test_words.append(w.get_text())
         test_count = len(test_words)
         g2p.set_dictionary(copy.deepcopy(dict_words))
+        g2p.align()
         g2p.update_rules()
         correct_count = self.run_regression(g2p, dict_words, test_words)
         self.assertTrue(correct_count > 1)
@@ -901,7 +899,7 @@ class G2PTestCase(unittest.TestCase):
         for w in dict_words[20:40]:
             async_test_words.append(w.get_text())
         dict_words.extend(dict_words_async)
-        g2p.update_rules_async(dict_words_async)
+        g2p.update_rules_async(copy.deepcopy(dict_words_async))
         while g2p.poll_update_rules_async():
             log.info("Waiting while rules are updated...")
             correct_count = self.run_regression(g2p, dict_words, test_words)
