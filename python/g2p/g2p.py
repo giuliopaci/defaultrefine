@@ -267,7 +267,7 @@ class G2P:
         if not silent:
             self.log.debug('G2P.predict_pronunciation("%s")' %word_str)
         mapped_str = ''
-        for c in u2a(word_str):
+        for c in word_str:
             mapped_str = mapped_str + self.gmap_s2c[c]
         pred = self.g2plib.predict_pronunciation(mapped_str)
         if pred == None:
@@ -835,7 +835,7 @@ class G2PTestCase(unittest.TestCase):
         for w in train_dict:
             test_words.append(w.get_text())
         train_count = len(test_words)
-        train_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=False, 
+        train_correct = self.run_regression(g2p, all_dict, test_words, unittest_assert=True, 
                                             show_results=False)
         # Predict test set words
         test_words = []
