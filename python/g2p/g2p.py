@@ -229,16 +229,15 @@ class G2P:
         @returns: True if rule update is still processing, otherwise False.
         @rtype: C{boolean}
         """
-        is_updating = True
-        if not self.updater.is_alive():
-            return False
         while self.pipe.poll():
             (self.rules) = self.pipe.recv()
             ctype_rules = (c_char_p * len(self.rules))()
             ctype_rules[:] = self.rules
             self.g2plib.set_rules(ctype_rules, len(ctype_rules))
-            is_updating = False
-        return is_updating
+            return False
+        if not self.updater.is_alive():
+            return False
+        return True
 
     def is_update_rules_async(self):
         """
