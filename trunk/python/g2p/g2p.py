@@ -291,7 +291,7 @@ class G2P:
             for i in range(len(w.graphemes)):
                 w.graphemes[i] = self.gmap_s2c[w.graphemes[i]]
         # Add null grapheme possibility
-        self.graphemes = [ ]
+        self.graphemes = [ '0' ]
         self.graphemes.extend( self.gmap_c2s.keys())
         
     def generate_phonemes(self):
@@ -907,6 +907,20 @@ class G2PTestCase(unittest.TestCase):
         correct_count = self.run_regression(g2p, dict_words_async, async_test_words)
         self.assertEquals(correct_count, 20)
 
+    def test_gnulls(self):
+        log = g2p_log
+        log.info("G2PTestCase.test_gnulls")
+        dic = [
+                Word("abc", ['a', 'b', 'b', 'c'], 0, 0),
+                Word("bac", ['b', 'b', 'a', 'c'], 0, 0),
+                Word("cab", ['c', 'a', 'b', 'b'], 0, 0)
+              ]
+        g2p = G2P()
+        g2p.set_dictionary(copy.deepcopy(dic))
+        g2p.align()
+        g2p.update_rules()
+        phones = g2p.predict_pronunciation("acb")
+
 if __name__ == "__main__":
     if os.name == 'nt':
         # Windows sends stdout to stderr causing error dialog on close, so we disable
@@ -919,6 +933,7 @@ if __name__ == "__main__":
     suite.addTest(G2PTestCase('test_setswana'))
     suite.addTest(G2PTestCase('test_update_rules_async'))
     suite.addTest(G2PTestCase('test_abort'))
+    suite.addTest(G2PTestCase('test_gnulls'))
     result = unittest.TextTestRunner().run(suite)
     if not result.wasSuccessful():
         sys.exit(1)
