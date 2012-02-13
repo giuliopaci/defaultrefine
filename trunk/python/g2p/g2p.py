@@ -277,7 +277,8 @@ class G2P:
             self.log.debug('G2P.predict_pronunciation("%s")' %word_str)
         mapped_str = ''
         for c in word_str:
-            mapped_str = mapped_str + self.gmap_s2c[c]
+            if c in self.gmap_s2c:
+                mapped_str = mapped_str + self.gmap_s2c[c]
         pred = self.g2plib.predict_pronunciation(mapped_str)
         if pred == None:
             return []
