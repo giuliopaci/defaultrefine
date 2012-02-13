@@ -908,6 +908,10 @@ class G2PTestCase(unittest.TestCase):
         self.assertEquals(correct_count, 20)
 
     def test_gnulls(self):
+        """
+        Test graphemic null processing.
+        """
+        #TODO: Get this test working.
         log = g2p_log
         log.info("G2PTestCase.test_gnulls")
         dic = [
