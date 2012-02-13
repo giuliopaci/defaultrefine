@@ -39,6 +39,9 @@
 #   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              #
 #                                                                             #
 #-----------------------------------------------------------------------------#
+"""
+G2P Python Extension
+"""
 
 import sys
 import unittest
@@ -48,14 +51,11 @@ import os
 import cPickle as pickle
 from multiprocessing import Process, Pipe
 from time import sleep
-import ctypes
-from ctypes import *
+from ctypes import c_char_p, c_int, c_wchar_p, cdll, POINTER
 import platform
 
 from log import Log
 from dictionaryfile import DictionaryFile
-from wordfile import WordFile
-from charset import u2a
 import charmap
 from g2p_pattern import Pattern
 from word import Word
@@ -66,6 +66,11 @@ global g2p_log
 g2p_log = None
 
 def set_g2p_log(log):
+    """
+    Set the global log.
+    @param log: log instance
+    @type log: C{Log}
+    """
     g2p_log = log
 
 def init_count_map(graphemes, phonemes):
@@ -85,15 +90,15 @@ def init_count_map(graphemes, phonemes):
             count_map[g][p] = 1
     return count_map
 
-def update_count_map(dict, count_map):
+def update_count_map(dic, count_map):
     """
     Update grapheme/phoneme counts using the given dictionary.
-    @param dict: List of Words
-    @type dict: C{List} of C{Word}
+    @param dic: List of Words
+    @type dic: C{List} of C{Word}
     @param count_map: Grapheme/phoneme count mapping
     @type count_map: C{dict}
     """
-    for w in dict:
+    for w in dic:
         graphs = w.get_graphemes()
         phones = w.get_phonemes()
         if len(graphs) == len(phones):
@@ -104,18 +109,18 @@ class G2PUpdater(Process):
     """
     G2P update process
     """
-    def __init__(self, dict, pipe):
+    def __init__(self, dic, pipe):
         """
         Initialize G2P update process
-        @param dict: Dictionary of words to process.
-        @type dict: C{list} of C{Word}
+        @param dic: Dictionary of words to process.
+        @type dic: C{list} of C{Word}
         @param pipe: Communication pipe.
         @type pipe: C{Pipe}
         """
         Process.__init__(self)
         log = g2p_log
         log.info("G2PUpdater.__init__()")
-        self.dict = dict
+        self.dic = dic
         self.pipe = pipe
 
     def run(self):
@@ -125,7 +130,7 @@ class G2PUpdater(Process):
         log = g2p_log
         log.info("G2PUpdater.run()")
         g2p = G2P()
-        g2p.set_dictionary(self.dict)
+        g2p.set_dictionary(self.dic)
         g2p.align()
         log.info("G2PUpdater updating rules...")
         g2p.update_rules()
@@ -154,9 +159,13 @@ class G2P:
                 g2p_log = Log(LOG_TITLE, LOG_PATH).get_log()
         self.log = g2p_log
         self.log.debug("G2P.__init__()")
-        self.dict = None                  # All words being considered
+        self.dic = None                  # All words being considered
         self.graphemes = None             # Grapheme list
         self.phonemes = None              # Phoneme list
+        self.gmap_c2s = None
+        self.gmap_s2c = None
+        self.pmap_c2s = None
+        self.pmap_s2c = None
         self.aligned_graphemes = None
         self.aligned_phonemes = None
         self.gnulled_dict = None
@@ -164,6 +173,8 @@ class G2P:
         self.patterns = None
         self.rules = []
         self.updater = None
+        self.g2plib = None
+        self.pipe = None
         self.setup_g2plib()
 
     def setup_g2plib(self):
@@ -184,13 +195,13 @@ class G2P:
         self.g2plib.predict_pronunciation.argtypes = [ c_wchar_p ]
         self.g2plib.predict_pronunciation.restype = c_char_p
 
-    def set_dictionary(self, dict):
+    def set_dictionary(self, dic):
         """
         Set G2P dictionary.
         @param: list of words
-        @type dict: C{list} of C{Word}
+        @type dic: C{list} of C{Word}
         """
-        self.dict = copy.deepcopy(dict)
+        self.dic = copy.deepcopy(dic)
         self.generate_phonemes()
         self.generate_graphemes()
         
@@ -211,15 +222,15 @@ class G2P:
         ctype_rules[:] = self.rules
         self.g2plib.set_rules(ctype_rules, len(ctype_rules))
 
-    def update_rules_async(self, dict):
+    def update_rules_async(self, dic):
         """
         Update rules with current word list asynchronously.  Call callback when complete.
         Keep old prediction rules active during new rule processing.
         """
         self.log.debug("G2P.update_rules_async()")
-        self.set_dictionary(dict)
+        self.set_dictionary(dic)
         self.pipe, pipe = Pipe()
-        self.updater = G2PUpdater(dict, pipe)
+        self.updater = G2PUpdater(dic, pipe)
         self.updater.start()
 
     def poll_update_rules_async(self):
@@ -282,12 +293,12 @@ class G2P:
         """
         self.log.debug("G2P.generate_graphemes()")
         graphs = []
-        for w in self.dict:
+        for w in self.dic:
             for g in w.graphemes:
                 if g not in graphs:
                     graphs.append(g)
         (self.gmap_c2s, self.gmap_s2c) = charmap.create_char_maps(graphs)
-        for w in self.dict:
+        for w in self.dic:
             for i in range(len(w.graphemes)):
                 w.graphemes[i] = self.gmap_s2c[w.graphemes[i]]
         # Add null grapheme possibility
@@ -301,12 +312,12 @@ class G2P:
         """
         self.log.debug("G2P.generate_phonemes()")
         phones = []
-        for w in self.dict:
+        for w in self.dic:
             for p in w.phonemes:
                 if p not in phones:
                     phones.append(p)
         (self.pmap_c2s, self.pmap_s2c) = charmap.create_char_maps(phones)
-        for w in self.dict:
+        for w in self.dic:
             for i in range(len(w.phonemes)):
                 w.phonemes[i] = self.pmap_s2c[w.phonemes[i]]
         self.phonemes = self.pmap_c2s.keys()
@@ -345,18 +356,15 @@ class G2P:
                 gnull_probs[g][p] = scale_factor * gnull_counts[g][p] / g_total_all    
         return (align_probs, gnull_probs)
 
-    def generate_word_gnulls(self, word, align_probs, gnull_probs):
+    def generate_word_gnulls(self, word, align_probs):
         """
         Generate graphemic nulls for given word.
         @param word: a word
         @type word: C{Word}
         @param align_probs: Alignment probability map
         @type align_probs: C{dict} of C{int}
-        @param gnull_probs: Graphemic null map
-        @type align_probs: C{dict} of C{int}
         """
         try:
-            label = " ".join(word.get_text())
             g_states = list(word.graphemes)
             p_states = list(word.phonemes)
             free_phones = len(p_states) - len(g_states)
@@ -398,12 +406,10 @@ class G2P:
                 for g_i in range(len(g_states)):
                     null_counts[p_i][g_i] = 0
             null_counts[0][0] = 1
-            null_counts[0][1]
-            
-            pre_backtrack = list(backtrack[len(p_states)-1][len(g_states) -1])
+            null_counts[0][1] = 0
             
             # For each phoneme, calculate the best path 
-            for p_i in range(1,len(p_states)):
+            for p_i in range(1, len(p_states)):
                 for g_i in range(len(g_states)):
                     # Search all possible paths and keep the best to be in state g_i 
                     # at time p_i.  This is the best route from p_states[t] to p_states[t+1]
@@ -413,9 +419,10 @@ class G2P:
                         # Possible route g_j to g_i
                         score = 0
                         if g_i == g_j and null_counts[p_i-1][g_j] < free_phones:
-                            score = float(scores[p_i-1][g_j] * align_probs['0'][p_states[p_i]])                            
+                            score = float(scores[p_i-1][g_j] * align_probs['0'][p_states[p_i]])
                         elif g_i == g_j+1:
-                            score = float(scores[p_i-1][g_j] * align_probs[g_states[g_i]][p_states[p_i]])
+                            score = float(scores[p_i-1][g_j] * \
+                                align_probs[g_states[g_i]][p_states[p_i]])
                         else:
                             score = 0
                         if score >= p_score:
@@ -458,7 +465,7 @@ class G2P:
         prob_threshold = 1
         # 'align_counts' counts the number of grapheme/phoneme alignments.
         align_counts = init_count_map(self.graphemes, self.phonemes)
-        update_count_map(self.dict, align_counts)        
+        update_count_map(self.dic, align_counts)        
         # 'gnull_counts' count the number of times a grapheme aligned to a phoneme after a there
         # was a previous alignment to '0'.
         gnull_counts = init_count_map(self.graphemes, self.phonemes)
@@ -469,12 +476,12 @@ class G2P:
             t_prob = 0
             self.log.debug("generate_gnull_subs(): Recalculating probabilities")
             align_counts = init_count_map(self.graphemes, self.phonemes)
-            update_count_map(self.dict, align_counts)                
+            update_count_map(self.dic, align_counts)                
             gnull_counts = init_count_map(self.graphemes, self.phonemes)
-            for i in range(len(self.dict)):
-                w = self.dict[i]
+            for i in range(len(self.dic)):
+                w = self.dic[i]
                 if (len(w.get_graphemes()) < len(w.get_phonemes())):
-                    (graphs, g_prob) = self.generate_word_gnulls(w, align_probs, gnull_probs)
+                    (graphs, g_prob) = self.generate_word_gnulls(w, align_probs)
                     t_prob += g_prob
                     # For each gnull found, capture one character before and one after, when
                     # possible.  Eg. au0tonomou0s would yield "u0t" and "u0s".                    
@@ -489,7 +496,7 @@ class G2P:
             # Recalculate probabilities based on current counts.
             (align_probs, gnull_probs) = self.generate_probability_maps(align_counts, gnull_counts)
         
-        self.gnulled_dict = copy.deepcopy(self.dict)
+        self.gnulled_dict = copy.deepcopy(self.dic)
         for i in range(len(self.gnulled_dict)):
             graphs = self.gnulled_dict[i].get_text()
             for (find, replace) in gnull_subs.items():
@@ -706,12 +713,12 @@ class G2P:
             del odict['pipe']
         return odict
 
-    def __setstate__(self, dict):
+    def __setstate__(self, dic):
         """
         Called when object is un-pickled (loaded from file).
         """
         # Called when project is loaded from file.
-        self.__dict__.update(dict)   # update attributes
+        self.__dict__.update(dic)   # update attributes
         self.log = g2p_log
         self.log.debug("G2P.__setstate__()")
         self.setup_g2plib()
@@ -727,12 +734,11 @@ class G2P:
         @type label: C{str}
         """
         f = open('%s.gra' %label, 'w')
-        for g in self.graphemes:
-            for k,v in self.gmap_s2c.iteritems():
-                f.write('%s -> %s\n' %(v, k.encode('utf-8')))
+        for k, v in self.gmap_s2c.iteritems():
+            f.write('%s -> %s\n' %(v, k.encode('utf-8')))
         f.close()
         f = open('%s.pho' %label, 'w')
-        for k,v in self.pmap_s2c.iteritems():
+        for k, v in self.pmap_s2c.iteritems():
             f.write('%s -> %s\n' %(k, v))
         f.close()
         f = open('%s.rul' %label, 'w')
@@ -740,7 +746,7 @@ class G2P:
             f.write('%s\n' %r)
         f.close()
         f = open('%s.dic' %label, 'w')
-        for w in self.dict:
+        for w in self.dic:
             f.write('%s %s\n' %(w.get_text(), ''.join(w.phonemes)))
         f.close()
         f = open('%s.pat' %label, 'w')
@@ -774,8 +780,6 @@ class G2PTestCase(unittest.TestCase):
         for t_word in test_words:
             for d_word in dict_words:
                 if t_word == d_word.get_text():
-                    result_str = "OKAY"
-                    graphs = d_word.get_graphemes()
                     phones = d_word.get_phonemes()
                     pred_phones = g2p.predict_pronunciation(t_word, silent=True)
                     if phones != pred_phones:
@@ -797,14 +801,14 @@ class G2PTestCase(unittest.TestCase):
         """
         log = g2p_log
         log.info("G2PTestCase.test_pickling()")
-        SAVE_FILE = "../test_data/tsn.g2p"
+        save_path = "../test_data/tsn.g2p"
         g2p_to_file = G2P()
         dict_words = DictionaryFile().from_file(self.TSN_FULL_DICT_PATH)
         g2p_to_file.set_dictionary(copy.deepcopy(dict_words))
         g2p_to_file.align()
         g2p_to_file.update_rules()
-        pickle.dump(g2p_to_file, open(SAVE_FILE, 'wb'))
-        g2p_from_file = pickle.load( open(SAVE_FILE) )
+        pickle.dump(g2p_to_file, open(save_path, 'wb'))
+        g2p_from_file = pickle.load( open(save_path) )
         test_words = []
         for w in dict_words[:20]:
             test_words.append(w.get_text())
@@ -886,7 +890,6 @@ class G2PTestCase(unittest.TestCase):
         test_words = []
         for w in dict_words[:20]:
             test_words.append(w.get_text())
-        test_count = len(test_words)
         g2p.set_dictionary(copy.deepcopy(dict_words))
         g2p.align()
         g2p.update_rules()
@@ -923,9 +926,17 @@ class G2PTestCase(unittest.TestCase):
         g2p.set_dictionary(copy.deepcopy(dic))
         g2p.align()
         g2p.update_rules()
-        phones = g2p.predict_pronunciation("acb")
+        log.info('Prediction test:')
+        for w in dic:
+            log.info('[%s]:[%s] -> [%s]' \
+                     %(w.get_text(), ' '.join(w.phonemes), 
+                       ' '.join(g2p.predict_pronunciation(w.get_text()))))
 
-if __name__ == "__main__":
+def main():
+    """
+    Main program entry point.  Runs unit tests.
+    """
+    global g2p_log
     if os.name == 'nt':
         # Windows sends stdout to stderr causing error dialog on close, so we disable
         # console output.
@@ -942,3 +953,6 @@ if __name__ == "__main__":
     if not result.wasSuccessful():
         sys.exit(1)
     sys.exit(0)
+
+if __name__ == "__main__":
+    main()
