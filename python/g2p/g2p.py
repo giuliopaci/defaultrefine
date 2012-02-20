@@ -279,6 +279,10 @@ class G2P:
         for c in word_str:
             if c in self.gmap_s2c:
                 mapped_str = mapped_str + self.gmap_s2c[c]
+            elif c == '0':
+                mapped_str = mapped_str + c
+            else:
+                self.log.warn('predict_pronunciation: Skipping unmatched grapheme: %s' %c)
         pred = self.g2plib.predict_pronunciation(mapped_str)
         if pred == None:
             return []
