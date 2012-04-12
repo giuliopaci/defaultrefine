@@ -177,6 +177,14 @@ class G2P:
         self.pipe = None
         self.setup_g2plib()
 
+    def get_rules(self):
+        """
+        Returns rule list.
+        @returns: rule list
+        @rtype: C{list} of C{str}
+        """
+        return self.rules
+
     def setup_g2plib(self):
         """
         Setup G2P C++ library bindings
