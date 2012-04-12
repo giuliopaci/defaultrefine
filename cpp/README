@@ -11,7 +11,12 @@ For example:
     $ sh autogen.sh
     $ ./configure
     $ make
-    $ make install
+    # make install
+
+Note that there are some common build dependencies.  The following meets those 
+requirements on Ubuntu 11.04:
+
+    # apt-get install automake libtool build-essential
 
 About
 -----
