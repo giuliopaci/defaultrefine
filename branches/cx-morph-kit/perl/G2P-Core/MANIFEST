@@ -1,0 +1,10 @@
+Changes
+Core.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+SVWChar.h
+typemap
+t/G2P-Core.t
+lib/G2P/Core.pm

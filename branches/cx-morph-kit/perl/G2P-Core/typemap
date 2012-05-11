@@ -1,0 +1,31 @@
+# typemap
+
+TYPEMAP
+#WORD				T_UV
+#DWORD				T_UV
+WCHAR *				T_WBUF
+#Some_Object *		T_OBJECT
+
+#############################################################################
+INPUT
+T_WBUF
+	$var = sv_to_wstr(aTHX_ $arg);
+T_UV
+	$var = ($type)SvUV($arg);
+T_OBJECT
+	if ( sv_isobject($arg) && ( SvTYPE( SvRV($arg) ) == SVt_PVMG) ) {
+		$var = INT2PTR($type, SvIV( SvRV($arg) ) );
+	} else {
+		croak(\"$var is not a blessed SV reference\");
+	}
+
+#############################################################################
+OUTPUT
+T_WBUF
+	if ( ! SvREADONLY($arg) )
+		$var = wstr_to_sv(aTHX_ $arg);
+T_UV
+	if ( ! SvREADONLY($arg) )
+		sv_setuv($arg, (UV)$var);
+T_OBJECT
+	sv_setref_pv($arg, CLASS, (void *)$var);

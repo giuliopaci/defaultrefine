@@ -1,0 +1,32 @@
+G2P-Core version 0.01
+=====================
+
+This module provides an interface to the C++ G2P library originally written
+by Marelie Davel.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  ExtUtils::PkgConfig for libg2p installs via pkg-config
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Martin Schlemmer <mschlemmer.ctxt@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
