@@ -98,12 +98,14 @@
     <ClCompile Include="..\..\..\..\libutil\StringHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\libg2p\g2pexports.h" />
     <ClInclude Include="..\..\..\..\libg2p\g2popt.h" />
     <ClInclude Include="..\..\..\..\libg2p\g2p_pattern.h" />
     <ClInclude Include="..\..\..\..\libg2p\GGroups.h" />
     <ClInclude Include="..\..\..\..\libg2p\GNode.h" />
     <ClInclude Include="..\..\..\..\libg2p\GRule.h" />
     <ClInclude Include="..\..\..\..\libg2p\GTree.h" />
+    <ClInclude Include="..\..\..\..\libg2p\libg2p.h" />
     <ClInclude Include="..\..\..\..\libg2p\RNode.h" />
     <ClInclude Include="..\..\..\..\libg2p\RTree.h" />
     <ClInclude Include="..\..\..\..\libutil\CmndArgs.h" />
