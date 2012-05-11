@@ -58,15 +58,12 @@
     #include <windows.h>
 #endif
 
+#include <libg2p/libg2p.h>
 #include <libg2p/RTree.h>
 #include <libutil/log.h>
 #include <libg2p/g2popt.h>
 #include <libutil/StringHelper.h>
 #include <libg2p/g2p_pattern.h>
-
-#ifndef _WIN32
-    #define __declspec(...)
-#endif
 
 using namespace std;
 
@@ -83,14 +80,14 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 #endif
 
 // Set the grapheme for prediction rule generation.
-extern "C" __declspec(dllexport) void set_grapheme(char *g)
+void set_grapheme(char *g)
 {
     //DEBUG_("set_grapheme(%s)", g);
     g_grapheme = *g;
 }
 
 // Add pattern to list of patterns for prediction rule generation.
-extern "C" __declspec(dllexport) void add_pattern(int id, char *phoneme, wchar_t *context)
+void add_pattern(int id, char *phoneme, wchar_t *context)
 {
     //DEBUG_("Adding pattern id=%d, phoneme='%s', context='%S'", id, 
     //       phoneme, context);
@@ -100,7 +97,7 @@ extern "C" __declspec(dllexport) void add_pattern(int id, char *phoneme, wchar_t
 }
 
 // Returns list of rules for given grapheme and patterns.
-extern "C" __declspec(dllexport) char** generate_rules(void)
+char** generate_rules(void)
 {
     DEBUG_("generate_rules() : %c", g_grapheme);
     bool use_groups = 0;
@@ -143,13 +140,13 @@ extern "C" __declspec(dllexport) char** generate_rules(void)
     return rules;
 }
 
-extern "C" __declspec(dllexport) void clear_patterns(void)
+void clear_patterns(void)
 {
     //DEBUG_("Clearing patterns");
     g_patterns.clear();
 }
 
-extern "C" __declspec(dllexport) void set_rules(char **rules, int count)
+void set_rules(char **rules, int count)
 {
     DEBUG_("Setting rules");
     // Reset rules
@@ -176,7 +173,7 @@ extern "C" __declspec(dllexport) void set_rules(char **rules, int count)
     }
 }
 
-extern "C" __declspec(dllexport) char* predict_pronunciation(wchar_t *wc_wordp)
+char* predict_pronunciation(wchar_t *wc_wordp)
 {
     int errno;
     string result_str = "";

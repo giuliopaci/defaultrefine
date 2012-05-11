@@ -74,6 +74,11 @@ case $host in
 		# OpenSolaris/Solaris seems not to link socket code, so we must do it.
 		LDFLAGS="$LDFLAGS -lnsl -lsocket"
 		;;
+	*mingw*)
+		# Ensure MSVC-compatible struct packing convention is used.
+		CFLAGS="$CFLAGS -mms-bitfields"
+		CXXFLAGS="$CXXFLAGS -mms-bitfields"
+		;;
 	*)
 		;;
 esac
@@ -101,6 +106,8 @@ if test "$enable_silent_libtool" = "yes"; then
 	LIBTOOLFLAGS=--silent
 fi
 AC_SUBST(LIBTOOLFLAGS)
+
+LT_INIT([win32-dll])
 
 dnl Check for system dependent features.
 AC_C_CONST
