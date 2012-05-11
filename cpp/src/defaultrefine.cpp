@@ -11,12 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <libg2p/GTree.h>
 #include <libutil/CmndArgs.h>
-#include <libutil/StringHelper.h>
-#include <libg2p/GRule.h>
-#include <libg2p/RTree.h>
-#include <libg2p/GGroups.h>
 #include <libg2p/g2popt.h>
 
 using namespace std;
