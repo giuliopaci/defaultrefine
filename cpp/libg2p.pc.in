@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: libg2p
 Description: An implementation of the Default&Refine algorithm.
 Version: @VERSION@
-Libs: -L${libdir}
+Libs: -L${libdir} -lg2p
 Cflags: -I${includedir}
