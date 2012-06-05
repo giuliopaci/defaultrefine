@@ -13,7 +13,7 @@ sub default_g2p_lib {
 }
 
 if ( eval "use ExtUtils::PkgConfig; 1" ) {
-    use ExtUtils::PkgConfig;
+    require ExtUtils::PkgConfig;
 
     eval {
         my $package = 'libg2p';
@@ -47,10 +47,12 @@ if ( eval "use ExtUtils::PkgConfig; 1" ) {
         }
     };
     if ($@) {
+        warn $@;
         default_g2p_lib();
     }
 }
 else {
+    warn "ExtUtils::PkgConfig not found, trying defaults";
     default_g2p_lib();
 }
 
