@@ -89,10 +89,9 @@ void
 add_pattern(id, phoneme, context)
     int id
     char *phoneme
-    WCHAR *context
+    wchar_t *context
   CODE:
     add_pattern(id, phoneme, context);
-    Safefree(context);
 
 
 void
@@ -144,10 +143,9 @@ set_rules(...)
 
 char *
 predict_pronunciation(word)
-    WCHAR *word
+    wchar_t *word
   CODE:
     RETVAL = (char *)predict_pronunciation(word);
-    Safefree(word);
 
   OUTPUT:
     RETVAL
