@@ -6,5 +6,10 @@ ppport.h
 README
 SVWChar.h
 typemap
-t/G2P-Core.t
 lib/G2P/Core.pm
+t/G2P-Core.t
+t/data/setswana/tn.dic
+t/data/setswana/tn.gra
+t/data/setswana/tn.pat
+t/data/setswana/tn.pho
+t/data/setswana/tn.rul
