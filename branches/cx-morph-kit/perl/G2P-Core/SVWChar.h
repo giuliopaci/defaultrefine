@@ -1,10 +1,73 @@
+#pragma once
+
+#include "ppport.h"
+
+/*
+ * Below is from the PERL module Lucene version 0.18
+ */
+
+wchar_t*
+SvToWChar(SV* arg)
+{
+    wchar_t* ret;
+    // Get string length of argument. This works for PV, NV and IV.
+    // The STRLEN typdef is needed to ensure that this will work correctly
+    // in a 64-bit environment.
+    STRLEN arg_len;
+    SvPV(arg, arg_len);
+
+    // Alloc memory for wide char string.  This could be a bit more
+    // then necessary.
+    Newz(0, ret, arg_len + 1, wchar_t);
+
+    U8* src = (U8*) SvPV_nolen(arg);
+    wchar_t* dst = ret;
+
+    if (SvUTF8(arg)) {
+        // UTF8 to wide char mapping
+        STRLEN len;
+        while (*src) {
+            *dst++ = utf8_to_uvuni(src, &len);
+            src += len;
+        }
+    } else {
+        // char to wide char mapping
+        while (*src) {
+            *dst++ = (wchar_t) *src++;
+        }
+    }
+    *dst = 0;
+    return ret;
+}
+
+SV*
+WCharToSv(wchar_t* src, SV* dest)
+{
+    U8* dst;
+    U8* d;
+
+    // Alloc memory for wide char string.  This is clearly wider
+    // then necessary in most cases but no choice.
+    Newz(0, dst, 3 * wcslen(src) + 1, U8);
+
+    d = dst;
+    while (*src) {
+        d = uvuni_to_utf8(d, *src++);
+    }
+    *d = 0;
+
+    sv_setpv(dest, (char*) dst);
+    sv_utf8_decode(dest);
+
+    Safefree(dst);
+    return dest;
+}
+
 /*
  * Below is from the PERL module Win32 version 0.29
  */
 
-#pragma once
-
-#include "ppport.h"
+#if defined(_WIN32)
 
 /* Convert SV to wide character string.  The return value must be
  * freed using Safefree().
@@ -71,3 +134,6 @@ wstr_to_sv(pTHX_ WCHAR *wstr)
     }
     return sv;
 }
+
+#endif /* _WIN32 */
+

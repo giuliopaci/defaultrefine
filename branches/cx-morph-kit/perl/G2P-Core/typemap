@@ -4,12 +4,17 @@ TYPEMAP
 #WORD				T_UV
 #DWORD				T_UV
 WCHAR *				T_WBUF
+wchar_t *			T_WCHAR
 #Some_Object *		T_OBJECT
 
 #############################################################################
 INPUT
 T_WBUF
 	$var = sv_to_wstr(aTHX_ $arg);
+	SAVEFREEPV($var);
+T_WCHAR
+	$var = SvToWChar($arg);
+	SAVEFREEPV($var);
 T_UV
 	$var = ($type)SvUV($arg);
 T_OBJECT
@@ -24,6 +29,14 @@ OUTPUT
 T_WBUF
 	if ( ! SvREADONLY($arg) )
 		$var = wstr_to_sv(aTHX_ $arg);
+T_WCHAR
+	{
+		wchar_t* src;
+		if (!$var)
+			XSRETURN_UNDEF;
+		src = (wchar_t *)$var;
+		WCharToSv(src, (SV *)$arg);
+	}
 T_UV
 	if ( ! SvREADONLY($arg) )
 		sv_setuv($arg, (UV)$var);
