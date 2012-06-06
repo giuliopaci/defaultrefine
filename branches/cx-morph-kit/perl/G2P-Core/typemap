@@ -13,7 +13,7 @@ T_WBUF
 	$var = sv_to_wstr(aTHX_ $arg);
 	SAVEFREEPV($var);
 T_WCHAR
-	$var = SvToWChar($arg);
+	$var = SvToWChar(aTHX_ $arg);
 	SAVEFREEPV($var);
 T_UV
 	$var = ($type)SvUV($arg);
@@ -35,7 +35,7 @@ T_WCHAR
 		if (!$var)
 			XSRETURN_UNDEF;
 		src = (wchar_t *)$var;
-		WCharToSv(src, (SV *)$arg);
+		WCharToSv(aTHX_ src, (SV *)$arg);
 	}
 T_UV
 	if ( ! SvREADONLY($arg) )

@@ -7,7 +7,7 @@
  */
 
 wchar_t*
-SvToWChar(SV* arg)
+SvToWChar(pTHX_ SV* arg)
 {
     wchar_t* ret;
     // Get string length of argument. This works for PV, NV and IV.
@@ -41,7 +41,7 @@ SvToWChar(SV* arg)
 }
 
 SV*
-WCharToSv(wchar_t* src, SV* dest)
+WCharToSv(pTHX_ wchar_t* src, SV* dest)
 {
     U8* dst;
     U8* d;
