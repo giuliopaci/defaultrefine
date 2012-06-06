@@ -6,10 +6,10 @@
  * Below is from the PERL module Lucene version 0.18
  */
 
-wchar_t*
-SvToWChar(pTHX_ SV* arg)
+wchar_t *
+SvToWChar(pTHX_ SV *arg)
 {
-    wchar_t* ret;
+    wchar_t *ret;
     // Get string length of argument. This works for PV, NV and IV.
     // The STRLEN typdef is needed to ensure that this will work correctly
     // in a 64-bit environment.
@@ -20,8 +20,8 @@ SvToWChar(pTHX_ SV* arg)
     // then necessary.
     Newz(0, ret, arg_len + 1, wchar_t);
 
-    U8* src = (U8*) SvPV_nolen(arg);
-    wchar_t* dst = ret;
+    U8 *src = (U8 *)SvPV_nolen(arg);
+    wchar_t *dst = ret;
 
     if (SvUTF8(arg)) {
         // UTF8 to wide char mapping
@@ -33,18 +33,18 @@ SvToWChar(pTHX_ SV* arg)
     } else {
         // char to wide char mapping
         while (*src) {
-            *dst++ = (wchar_t) *src++;
+            *dst++ = (wchar_t)*src++;
         }
     }
     *dst = 0;
     return ret;
 }
 
-SV*
-WCharToSv(pTHX_ wchar_t* src, SV* dest)
+SV *
+WCharToSv(pTHX_ wchar_t *src, SV *dest)
 {
-    U8* dst;
-    U8* d;
+    U8 *dst;
+    U8 *d;
 
     // Alloc memory for wide char string.  This is clearly wider
     // then necessary in most cases but no choice.
@@ -56,7 +56,7 @@ WCharToSv(pTHX_ wchar_t* src, SV* dest)
     }
     *d = 0;
 
-    sv_setpv(dest, (char*) dst);
+    sv_setpv(dest, (char *)dst);
     sv_utf8_decode(dest);
 
     Safefree(dst);
@@ -72,7 +72,7 @@ WCharToSv(pTHX_ wchar_t* src, SV* dest)
 /* Convert SV to wide character string.  The return value must be
  * freed using Safefree().
  */
-WCHAR*
+WCHAR *
 sv_to_wstr(pTHX_ SV *sv)
 {
     DWORD wlen;
