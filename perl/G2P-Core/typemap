@@ -31,8 +31,8 @@ T_WBUF
 		$var = wstr_to_sv(aTHX_ $arg);
 T_WCHAR
 	{
-		wchar_t* src;
-		if (!$var)
+		wchar_t *src;
+		if ( !$var )
 			XSRETURN_UNDEF;
 		src = (wchar_t *)$var;
 		WCharToSv(aTHX_ src, (SV *)$arg);
