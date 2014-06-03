@@ -778,7 +778,12 @@ sub add_gnull_word($\%) {
 sub add_gnull_list(\%\%) {
 	my ($dictp,$gnullp) = @_;
 	print "-- Enter add_gnull_list" if $debug;
-	while (my ($word,$sound)=each %$dictp) {
+	# JWFT - 3 June 2014:
+	# The following causes a bug in perl 5.18.2
+	# See: http://blogs.perl.org/users/rurban/2014/04/do-not-use-each.html
+	# while (my ($word,$sound)=each %$dictp) {
+	foreach my $word (keys %{$dictp}) {
+		my $sound = ${$dictp}{$word};
 		$newword = add_gnull_word($word,%$gnullp);
 		if (!($newword eq $word)) {
 			#if (exist $dictp->{$newword}) {
