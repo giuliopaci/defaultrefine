@@ -10,7 +10,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
 dnl Version information.
-LIBG2P_VERSION=$(cat "version")
+LIBG2P_VERSION=$(cat "$srcdir""/version")
 AC_SUBST(LIBG2P_VERSION)
 
 AM_INIT_AUTOMAKE(defaultrefine, ${LIBG2P_VERSION})
@@ -126,7 +126,7 @@ AC_CHECK_FUNCS(strcpy bcopy memcpy, break)
 AC_CHECK_FUNCS(strcasecmp strchr strstr, break)
 
 dnl Version information.
-LIBG2P_VERSION_LIBG2P=$(cat "version.libg2p")
+LIBG2P_VERSION_LIBG2P=`cat "$srcdir/""version.libg2p"`
 AC_SUBST(LIBG2P_VERSION_LIBG2P)
 
 dnl Create Makefiles.
