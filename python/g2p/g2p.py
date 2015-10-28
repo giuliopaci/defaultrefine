@@ -194,6 +194,8 @@ class G2P:
             self.g2plib = cdll.LoadLibrary("libg2p.so")
         elif system == 'Windows':
             self.g2plib = cdll.LoadLibrary("WinG2PDLL.dll")
+        elif system == 'Darwin':
+            self.g2plib = cdll.LoadLibrary("libg2p.dylib")
         else:
             raise OSError
         self.g2plib.set_grapheme.argtypes = [ c_char_p ]
