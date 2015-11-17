@@ -1,26 +1,27 @@
 dnl Main setup.
 AC_INIT(defaultrefine, m4_esyscmd([tr -d '\n' < version]))
+AC_CONFIG_AUX_DIR(config)
+AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_SRCDIR([src/defaultrefine.cpp])
 AC_CONFIG_SRCDIR(src/defaultrefine.cpp)
 AC_CONFIG_HEADER(config.h:config-h.in)
-AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_MACRO_DIR(m4)
 AM_PROG_CC_C_O
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
 dnl Version information.
 LIBG2P_VERSION=$PACKAGE_VERSION
 AC_SUBST(LIBG2P_VERSION)
 
-AM_INIT_AUTOMAKE
 
 dnl Check for programs.
 AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LN_S
+AM_PROG_AR
 
 LT_INIT
 AC_SUBST(LIBTOOL_DEPS)
