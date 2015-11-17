@@ -41,6 +41,7 @@
 
 import sys
 from g2p import *
+#import pprint
 
 # Create the G2P
 g2p = G2P()
@@ -53,4 +54,15 @@ g2p.update_rules()
 rules = g2p.get_rules()
 
 # Print the rules
-print '\n'.join(rules)
+#print '\n'.join(rules)
+#pp = pprint.PrettyPrinter(indent=4)
+#pp.pprint(g2p.pmap_c2s)
+out_file = open(sys.argv[2],"w")
+out_file.write('\n'.join(rules))
+out_file.close()
+
+out_file = open(sys.argv[3],"w")
+for k, v in g2p.pmap_c2s.iteritems():
+       out_file.write("{k};{v}\n".format(k=k,v=v))
+out_file.close()
+
