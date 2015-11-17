@@ -1,5 +1,6 @@
 dnl Main setup.
-AC_INIT(src/defaultrefine.cpp)
+AC_INIT(defaultrefine, m4_esyscmd([tr -d '\n' < version]))
+AC_CONFIG_SRCDIR([src/defaultrefine.cpp])
 AC_CONFIG_SRCDIR(src/defaultrefine.cpp)
 AC_CONFIG_HEADER(config.h:config-h.in)
 AC_CONFIG_AUX_DIR(config)
@@ -10,28 +11,28 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
 dnl Version information.
-LIBG2P_VERSION=$(cat "$srcdir""/version")
+LIBG2P_VERSION=$PACKAGE_VERSION
 AC_SUBST(LIBG2P_VERSION)
 
-AM_INIT_AUTOMAKE(defaultrefine, ${LIBG2P_VERSION})
+AM_INIT_AUTOMAKE
 
 dnl Check for programs.
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LN_S
 
-AC_PROG_LIBTOOL
+LT_INIT
 AC_SUBST(LIBTOOL_DEPS)
 
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 
 dnl Packaging.
 m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG])
 
 dnl Profiling.
 AC_MSG_CHECKING([whether to make a profiling build])
-AC_ARG_ENABLE(profile, AC_HELP_STRING([--enable-profile], [make a profile build]))
+AC_ARG_ENABLE(profile, AS_HELP_STRING([--enable-profile],[make a profile build]))
 AC_MSG_RESULT($enable_profile)
 if test "$enable_profile" = "yes"; then
 	CPPFLAGS="-pg"
@@ -45,7 +46,7 @@ fi
 dnl Debugging.
 if test "$enable_profile" = "no"; then
 	AC_MSG_CHECKING([whether to make a debug build])
-	AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug], [make a debug build]))
+	AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug],[make a debug build]))
 	AC_MSG_RESULT($enable_debug)
 	if test "$enable_debug" = "yes"; then
 		CPPFLAGS="-g"
@@ -95,7 +96,7 @@ AC_CHECK_HEADERS(string.h strings.h, break)
 
 dnl Allow libtool to be silenced.
 AC_MSG_CHECKING([whether libtool should be silenced])
-AC_ARG_ENABLE(silent-libtool, AC_HELP_STRING([--disable-silent-libtool], [Verbose libtool]),, enable_silent_libtool=yes)
+AC_ARG_ENABLE(silent-libtool, AS_HELP_STRING([--disable-silent-libtool],[Verbose libtool]),, enable_silent_libtool=yes)
 AC_MSG_RESULT($enable_silent_libtool)
 if test "$enable_silent_libtool" = "yes"; then
 	LIBTOOLFLAGS=--silent
@@ -108,7 +109,7 @@ AC_C_VOLATILE
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_C_BIGENDIAN
-AC_WORDS_BIGENDIAN
+AC_C_BIGENDIAN
 AC_FUNC_MALLOC
 
 dnl C++ compiler/environment checks.
@@ -130,8 +131,9 @@ LIBG2P_VERSION_LIBG2P=`cat "$srcdir/""version.libg2p"`
 AC_SUBST(LIBG2P_VERSION_LIBG2P)
 
 dnl Create Makefiles.
-AC_OUTPUT([Makefile libg2p.pc libutil/Makefile libg2p/Makefile src/Makefile],
-	[test -z "$CONFIG_HEADERS" || echo timestamp > libg2p/stamp-h.in])
+AC_CONFIG_FILES([Makefile libg2p.pc libutil/Makefile libg2p/Makefile src/Makefile])
+AC_CONFIG_COMMANDS([default],[test -z "$CONFIG_HEADERS" || echo timestamp > libg2p/stamp-h.in],[])
+AC_OUTPUT
 
 dnl Report configuration.
 echo
