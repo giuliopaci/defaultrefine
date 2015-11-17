@@ -132,7 +132,7 @@ LIBG2P_VERSION_LIBG2P=`cat "$srcdir/""version.libg2p"`
 AC_SUBST(LIBG2P_VERSION_LIBG2P)
 
 dnl Create Makefiles.
-AC_CONFIG_FILES([Makefile libg2p.pc libutil/Makefile libg2p/Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile libg2p.pc])
 AC_CONFIG_COMMANDS([default],[test -z "$CONFIG_HEADERS" || echo timestamp > libg2p/stamp-h.in],[])
 AC_OUTPUT
 
